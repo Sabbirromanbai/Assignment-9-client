@@ -15,6 +15,7 @@ type ProfileImageUploadProps = {
   onChange: (url: string | null) => void
   onUploadingChange?: (uploading: boolean) => void
   disabled?: boolean
+  endpoint?: string
 }
 
 export function ProfileImageUpload({
@@ -22,6 +23,7 @@ export function ProfileImageUpload({
   onChange,
   onUploadingChange,
   disabled = false,
+  endpoint = "/api/profile/images",
 }: ProfileImageUploadProps) {
   const reduceMotion = useReducedMotion()
   const inputRef = React.useRef<HTMLInputElement | null>(null)
@@ -84,7 +86,7 @@ export function ProfileImageUpload({
     setUploading(true)
 
     const xhr = new XMLHttpRequest()
-    xhr.open("POST", `${API_BASE_URL}/api/profile/images`)
+    xhr.open("POST", `${API_BASE_URL}${endpoint}`)
     xhr.setRequestHeader("Content-Type", file.type)
     xhr.setRequestHeader("X-File-Name", file.name)
 

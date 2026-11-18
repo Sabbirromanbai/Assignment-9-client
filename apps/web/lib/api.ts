@@ -148,15 +148,18 @@ async function getAuthToken(signal?: AbortSignal): Promise<string> {
 
 export async function fetchWithAuth<T>(
   path: string,
+  init: RequestInit = {},
   signal?: AbortSignal
 ): Promise<ApiEnvelope<T>> {
   const token = await getAuthToken(signal)
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
     signal,
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
+      ...init.headers,
     },
     cache: "no-store",
   })
@@ -187,8 +190,61 @@ export async function fetchVendorDashboard(
 ): Promise<VendorDashboardData> {
   const response = await fetchWithAuth<VendorDashboardData>(
     "/api/vendors/dashboard",
+    {},
     signal
   )
 
   return response.data
+}
+
+export type CreateMenuItemInput = {
+  itemName: string
+  category: string
+  description: string
+  price: number
+  location: string
+  images: string[]
+}
+
+export async function createMenuItem(
+  input: CreateMenuItemInput,
+  signal?: AbortSignal
+): Promise<MenuItem> {
+  const response = await fetchWithAuth<MenuItem>(
+    "/api/menu",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    },
+    signal
+  )
+
+  return response.data
+}
+
+export async function fetchUploadMenuImage(
+  file: File,
+  signal?: AbortSignal
+): Promise<string> {
+  const response = await fetchWithAuth<{ url: string }>(
+    "/api/menu/images",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type,
+        "X-File-Name": file.name,
+      },
+      body: file,
+    },
+    signal
+  )
+
+  if (!response.data || typeof response.data.url !== "string") {
+    throw new Error("Image upload failed: no image URL returned")
+  }
+
+  return response.data.url
 }

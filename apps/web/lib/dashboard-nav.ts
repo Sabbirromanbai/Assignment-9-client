@@ -84,3 +84,14 @@ export function normalizeRole(value: unknown): DashboardRole | null {
     ? value
     : null
 }
+
+export const PIZZA_CATEGORIES = [
+  "Classic Pizzas",
+  "Vegetarian Pizzas",
+  "Meat Lovers",
+  "Specialty / Gourmet Pizzas",
+  "Sides & Appetizers",
+  "Beverages & Desserts",
+] as const
+
+export type PizzaCategory = (typeof PIZZA_CATEGORIES)[number]

@@ -3,12 +3,12 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, MapPin, Pizza, RefreshCw } from "lucide-react"
+import { ArrowRight, MapPin, Pizza, RefreshCw, Store } from "lucide-react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { fetchMenuItems, type MenuItem } from "@/lib/api"
+import { fetchMenuItems, fetchVendorProfile, type MenuItem, type VendorProfile } from "@/lib/api"
 
 const FEATURED_COUNT = 6
 
@@ -40,7 +40,13 @@ function FeaturedSkeleton() {
   )
 }
 
-function FeaturedCard({ item }: { item: MenuItem }) {
+function FeaturedCard({
+  item,
+  vendor,
+}: {
+  item: MenuItem
+  vendor?: VendorProfile
+}) {
   const image = item.images?.[0]
   const [imageFailed, setImageFailed] = React.useState(false)
 
@@ -87,6 +93,13 @@ function FeaturedCard({ item }: { item: MenuItem }) {
           <span className="truncate">{item.location}</span>
         </p>
 
+        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Store className="size-4 shrink-0 text-primary" aria-hidden="true" />
+          <span className="truncate">
+            {vendor?.businessName || vendor?.name || "Vendor unavailable"}
+          </span>
+        </p>
+
         <Link
           href={`/menu/${item._id}`}
           className={cn(
@@ -104,6 +117,7 @@ function FeaturedCard({ item }: { item: MenuItem }) {
 
 export function FeaturedPizzas() {
   const [items, setItems] = React.useState<MenuItem[]>([])
+  const [vendors, setVendors] = React.useState<Record<string, VendorProfile>>({})
   const [status, setStatus] = React.useState<
     "loading" | "success" | "empty" | "error"
   >("loading")
@@ -118,12 +132,33 @@ export function FeaturedPizzas() {
         setStatus("loading")
         setError(null)
 
-        const data = await fetchMenuItems(controller.signal)
+        const data = await fetchMenuItems({}, controller.signal)
         const featured = data
           .filter((item) => item.status === "approved")
           .slice(0, FEATURED_COUNT)
 
+        const vendorIds = [
+          ...new Set(featured.map((item) => item.vendorId).filter(Boolean)),
+        ]
+
+        const vendorResults = await Promise.allSettled(
+          vendorIds.map((vendorId) =>
+            fetchVendorProfile(vendorId, controller.signal)
+          )
+        )
+
+        const vendorMap: Record<string, VendorProfile> = {}
+        vendorResults.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const vendorId = vendorIds[index]
+            if (vendorId) {
+              vendorMap[vendorId] = result.value
+            }
+          }
+        })
+
         setItems(featured)
+        setVendors(vendorMap)
         setStatus(featured.length > 0 ? "success" : "empty")
       } catch (caughtError) {
         if (controller.signal.aborted) {
@@ -174,7 +209,11 @@ export function FeaturedPizzas() {
         {status === "success" ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <FeaturedCard key={item._id} item={item} />
+              <FeaturedCard
+                key={item._id}
+                item={item}
+                vendor={vendors[item.vendorId]}
+              />
             ))}
           </div>
         ) : null}

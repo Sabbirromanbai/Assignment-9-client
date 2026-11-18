@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
+import { ProfileImageUpload } from "@/components/profile-image-upload"
 import { authClient } from "@/lib/auth-client"
 import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -21,7 +22,6 @@ type SignUpValues = {
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const URL_PATTERN = /^https?:\/\/.+/i
 
 function validate(values: SignUpValues) {
   const errors: Partial<Record<keyof SignUpValues, string>> = {}
@@ -48,10 +48,6 @@ function validate(values: SignUpValues) {
     errors.password = "Password must include a lowercase letter."
   }
 
-  if (values.image.trim() && !URL_PATTERN.test(values.image.trim())) {
-    errors.image = "Profile image must be a valid URL."
-  }
-
   if (!values.role) {
     errors.role = "Select an account type."
   }
@@ -75,6 +71,7 @@ export function SignUpForm() {
   >({})
   const [showPassword, setShowPassword] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isImageUploading, setIsImageUploading] = React.useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -383,33 +380,16 @@ export function SignUpForm() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.44 }}
             >
-              <label
-                htmlFor="sign-up-image"
-                className="mb-2 block text-sm font-medium"
-              >
-                Profile image URL
+              <label className="mb-2 block text-sm font-medium">
+                Profile image
                 <span className="ml-1 text-muted-foreground">(optional)</span>
               </label>
-              <input
-                id="sign-up-image"
-                name="image"
-                type="url"
-                autoComplete="photo"
-                value={values.image}
-                onChange={(event) => updateField("image", event.target.value)}
-                aria-invalid={Boolean(errors.image)}
-                aria-describedby={errors.image ? "sign-up-image-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
-                placeholder="https://..."
+              <ProfileImageUpload
+                value={values.image || null}
+                disabled={isSubmitting || isGoogleLoading}
+                onUploadingChange={setIsImageUploading}
+                onChange={(url) => updateField("image", url ?? "")}
               />
-              {errors.image ? (
-                <p
-                  id="sign-up-image-error"
-                  className="mt-2 text-sm text-destructive"
-                >
-                  {errors.image}
-                </p>
-              ) : null}
             </motion.div>
 
             <motion.div
@@ -419,10 +399,10 @@ export function SignUpForm() {
             >
               <button
                 type="submit"
-                disabled={isSubmitting || isGoogleLoading}
+                disabled={isSubmitting || isGoogleLoading || isImageUploading}
                 className={cn(
                   "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
-                  (isSubmitting || isGoogleLoading) && "cursor-not-allowed opacity-70"
+                  (isSubmitting || isGoogleLoading || isImageUploading) && "cursor-not-allowed opacity-70"
                 )}
               >
                 {isSubmitting ? (

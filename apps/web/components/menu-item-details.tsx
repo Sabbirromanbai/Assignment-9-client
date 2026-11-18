@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Store,
 } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -52,6 +53,7 @@ function DetailSkeleton() {
 }
 
 export function MenuItemDetails({ id }: MenuItemDetailsProps) {
+  const reduceMotion = useReducedMotion()
   const [item, setItem] = React.useState<MenuItem | null>(null)
   const [vendor, setVendor] = React.useState<VendorProfile | null>(null)
   const [selectedImage, setSelectedImage] = React.useState(0)
@@ -197,7 +199,12 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
   }
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <motion.section
+      className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
       <nav
         aria-label="Breadcrumb"
         className="mb-6 flex items-center gap-2 text-sm text-muted-foreground"
@@ -317,6 +324,6 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }

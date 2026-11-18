@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Pizza, RefreshCw } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -62,12 +63,19 @@ function CategorySkeleton() {
 
 function CategoryCard({ category }: { category: Category }) {
   const [imageFailed, setImageFailed] = React.useState(false)
+  const reduceMotion = useReducedMotion()
 
   return (
-    <Link
-      href={`/menu?category=${encodeURIComponent(category.name)}`}
-      className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
+      <Link
+        href={`/menu?category=${encodeURIComponent(category.name)}`}
+        className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+      >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {category.image && !imageFailed ? (
           <Image
@@ -103,6 +111,7 @@ function CategoryCard({ category }: { category: Category }) {
         </span>
       </div>
     </Link>
+    </motion.div>
   )
 }
 

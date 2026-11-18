@@ -1,4 +1,7 @@
+"use client"
+
 import { Leaf, ShieldCheck, ShoppingBag } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 const features = [
   {
@@ -22,9 +25,17 @@ const features = [
 ] as const
 
 export function WhyChoosePizzaHub() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-      <div className="mx-auto max-w-2xl text-center">
+      <motion.div
+        className="mx-auto max-w-2xl text-center"
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
           Why PizzaHub
         </span>
@@ -35,17 +46,24 @@ export function WhyChoosePizzaHub() {
           From the first stretch of dough to the final slice, every detail is
           built around freshness, trust and ease.
         </p>
-      </div>
+      </motion.div>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((feature, index) => {
           const Icon = feature.icon
 
           return (
-            <article
+            <motion.article
               key={feature.title}
-              className="group rounded-2xl border border-border/70 bg-card p-6 shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 motion-reduce:animate-none"
-              style={{ animationDelay: `${index * 120}ms` }}
+              className="group rounded-2xl border border-border/70 bg-card p-6 shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.55,
+                delay: reduceMotion ? 0 : index * 0.1,
+                ease: [0.22, 1, 0.36, 1],
+              }}
             >
               <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 ease-smooth group-hover:scale-110">
                 <Icon className="size-6" aria-hidden="true" />
@@ -56,7 +74,7 @@ export function WhyChoosePizzaHub() {
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {feature.description}
               </p>
-            </article>
+            </motion.article>
           )
         })}
       </div>

@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, Search, ShoppingBag, Smile } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -29,9 +32,17 @@ const steps = [
 ] as const
 
 export function HowPizzaHubWorks() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-      <div className="mx-auto max-w-2xl text-center">
+      <motion.div
+        className="mx-auto max-w-2xl text-center"
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
           How it works
         </span>
@@ -41,12 +52,17 @@ export function HowPizzaHubWorks() {
         <p className="mt-3 text-muted-foreground">
           From craving to first bite, ordering with PizzaHub stays simple.
         </p>
-      </div>
+      </motion.div>
 
       <div className="relative mt-14">
-        <div
+        <motion.div
           aria-hidden="true"
           className="absolute left-[16.666%] right-[16.666%] top-10 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent lg:block"
+          initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformOrigin: "center" }}
         />
 
         <div className="grid gap-8 md:grid-cols-3">
@@ -54,10 +70,17 @@ export function HowPizzaHubWorks() {
             const Icon = step.icon
 
             return (
-              <article
+              <motion.article
                 key={step.title}
-                className="group relative rounded-2xl border border-border/70 bg-card p-6 text-center shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 motion-reduce:animate-none"
-                style={{ animationDelay: `${index * 120}ms` }}
+                className="group relative rounded-2xl border border-border/70 bg-card p-6 text-center shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{
+                  duration: 0.55,
+                  delay: reduceMotion ? 0 : index * 0.12,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
               >
                 <span className="absolute -top-5 left-1/2 z-10 grid size-10 -translate-x-1/2 place-items-center rounded-full bg-primary font-heading text-sm font-bold text-primary-foreground shadow-glow">
                   {step.number}
@@ -73,13 +96,19 @@ export function HowPizzaHubWorks() {
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>
-              </article>
+              </motion.article>
             )
           })}
         </div>
       </div>
 
-      <div className="mt-12 flex justify-center">
+      <motion.div
+        className="mt-12 flex justify-center"
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.45, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      >
         <Link
           href="/menu"
           className={cn(buttonVariants(), "shadow-glow")}
@@ -87,7 +116,7 @@ export function HowPizzaHubWorks() {
           Browse Menu
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
-      </div>
+      </motion.div>
     </section>
   )
 }

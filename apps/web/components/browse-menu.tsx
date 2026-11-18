@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Pizza, RefreshCw, Search, Store } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 import { Button } from "@workspace/ui/components/button"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -56,15 +57,28 @@ function MenuSkeleton() {
 function MenuCard({
   item,
   vendor,
+  index = 0,
 }: {
   item: MenuItem
   vendor?: VendorProfile
+  index?: number
 }) {
   const image = item.images?.[0]
   const [imageFailed, setImageFailed] = React.useState(false)
+  const reduceMotion = useReducedMotion()
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated">
+    <motion.article
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: 0.5,
+        delay: reduceMotion ? 0 : (index % 4) * 0.08,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {image && !imageFailed ? (
           <Image
@@ -124,7 +138,7 @@ function MenuCard({
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-    </article>
+    </motion.article>
   )
 }
 
@@ -343,11 +357,12 @@ export function BrowseMenu({
 
         {status === "success" ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <MenuCard
                 key={item._id}
                 item={item}
                 vendor={vendors[item.vendorId]}
+                index={index}
               />
             ))}
           </div>

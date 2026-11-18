@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, MapPin, Pizza, RefreshCw, Store } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -49,9 +50,16 @@ function FeaturedCard({
 }) {
   const image = item.images?.[0]
   const [imageFailed, setImageFailed] = React.useState(false)
+  const reduceMotion = useReducedMotion()
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated">
+    <motion.article
+      className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+      initial={reduceMotion ? false : { opacity: 0, y: 26 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {image && !imageFailed ? (
           <Image
@@ -111,7 +119,7 @@ function FeaturedCard({
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-    </article>
+    </motion.article>
   )
 }
 

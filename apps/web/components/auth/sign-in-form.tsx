@@ -35,7 +35,11 @@ function validate(values: SignInValues) {
   return errors
 }
 
-export function SignInForm() {
+export function SignInForm({
+  callbackURL = "/",
+}: {
+  callbackURL?: string
+}) {
   const router = useRouter()
   const reduceMotion = useReducedMotion()
   const { toast } = useToast()
@@ -81,7 +85,7 @@ export function SignInForm() {
         title: "Welcome back",
         description: "Signing you in to PizzaHub.",
       })
-      router.push("/")
+      router.push(callbackURL)
       router.refresh()
     } catch {
       toast({
@@ -104,7 +108,7 @@ export function SignInForm() {
     try {
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${window.location.origin}/`,
+        callbackURL: `${window.location.origin}${callbackURL}`,
       })
 
       if (error) {

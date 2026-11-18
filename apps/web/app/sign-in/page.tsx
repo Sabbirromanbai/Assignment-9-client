@@ -7,6 +7,18 @@ export const metadata: Metadata = {
   description: "Sign in to your PizzaHub account.",
 }
 
-export default function SignInPage() {
-  return <SignInForm />
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackURL?: string }>
+}) {
+  const params = await searchParams
+  const requested = params.callbackURL
+
+  const callbackURL =
+    requested?.startsWith("/") && !requested.startsWith("//")
+      ? requested
+      : "/"
+
+  return <SignInForm callbackURL={callbackURL} />
 }

@@ -258,19 +258,18 @@ export function Navbar() {
                     </div>
 
                     <div className="py-1">
-                      <button
-                        type="button"
-                        disabled
+                      <Link
+                        href="/dashboard"
                         role="menuitem"
-                        className="flex w-full cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground opacity-60"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       >
                         <LayoutDashboard
                           className="size-4"
                           aria-hidden="true"
                         />
                         Dashboard
-                        <span className="ml-auto text-xs">Soon</span>
-                      </button>
+                      </Link>
                       <button
                         type="button"
                         disabled
@@ -403,6 +402,14 @@ export function Navbar() {
                       </p>
                     ) : null}
                   </div>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setOpen(false)}
+                    className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+                  >
+                    <LayoutDashboard className="size-4" aria-hidden="true" />
+                    Dashboard
+                  </Link>
                   <button
                     type="button"
                     onClick={handleSignOut}

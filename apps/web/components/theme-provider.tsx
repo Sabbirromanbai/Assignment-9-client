@@ -10,7 +10,8 @@ function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="light"
+      storageKey="pizzahub-theme"
       enableSystem
       disableTransitionOnChange
       {...props}

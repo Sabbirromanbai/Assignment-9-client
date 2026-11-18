@@ -1,18 +1,28 @@
 import type { Metadata } from "next"
 
-import { PagePlaceholder } from "@/components/page-placeholder"
+import { BrowseMenu } from "@/components/browse-menu"
 
 export const metadata: Metadata = {
   title: "Browse Menu",
-  description: "Explore the PizzaHub menu of wood-fired pizzas.",
+  description: "Search and filter approved PizzaHub menu items.",
 }
 
-export default function MenuPage() {
+export default async function MenuPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string
+    category?: string
+    location?: string
+  }>
+}) {
+  const params = await searchParams
+
   return (
-    <PagePlaceholder
-      eyebrow="Menu"
-      title="Our menu is firing up"
-      description="The full PizzaHub menu is being prepared. Soon you'll find every wood-fired pizza, side and drink right here."
+    <BrowseMenu
+      initialSearch={params.search}
+      initialCategory={params.category}
+      initialLocation={params.location}
     />
   )
 }

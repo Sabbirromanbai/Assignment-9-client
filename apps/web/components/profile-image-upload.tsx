@@ -6,6 +6,7 @@ import { Upload, X } from "lucide-react"
 
 import { cn } from "@workspace/ui/lib/utils"
 import { API_BASE_URL } from "@/lib/api"
+import { authClient } from "@/lib/auth-client"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 const MAX_SIZE = 5 * 1024 * 1024
@@ -85,10 +86,20 @@ export function ProfileImageUpload({
     setProgress(0)
     setUploading(true)
 
+    const tokenResp = await fetch(`${API_BASE_URL}/api/auth/token`, {
+      credentials: "include",
+      headers: { Accept: "application/json" },
+    })
+    const tokenData = (await tokenResp.json()) as { token?: string }
+    const token = tokenData?.token
+
     const xhr = new XMLHttpRequest()
     xhr.open("POST", `${API_BASE_URL}${endpoint}`)
     xhr.setRequestHeader("Content-Type", file.type)
     xhr.setRequestHeader("X-File-Name", file.name)
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`)
+    }
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {

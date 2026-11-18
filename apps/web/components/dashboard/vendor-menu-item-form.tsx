@@ -370,27 +370,39 @@ export function VendorMenuItemForm() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.5 }}
           >
-            <button
-              type="submit"
-              disabled={isSubmitting || isImageUploading || !values.image}
-              className={cn(
-                "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
-                (isSubmitting || isImageUploading || !values.image) &&
-                  "cursor-not-allowed opacity-70"
+            <div className="flex flex-col gap-3">
+              <button
+                type="submit"
+                disabled={isSubmitting || isImageUploading || !values.image}
+                className={cn(
+                  "h-11 w-full rounded-xl border border-border/70 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
+                  (isSubmitting || isImageUploading || !values.image) &&
+                    "cursor-not-allowed opacity-70 border-transparent"
+                )}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    Submitting
+                  </>
+                ) : (
+                  <>
+                    <Pizza className="size-4" aria-hidden="true" />
+                    Create menu item
+                  </>
+                )}
+              </button>
+              {!values.image && !isSubmitting && !isImageUploading && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Upload an item image to enable this button.
+                </p>
               )}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                  Submitting
-                </>
-              ) : (
-                <>
-                  <Pizza className="size-4" aria-hidden="true" />
-                  Create menu item
-                </>
+              {isSubmitting && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Submitting your menu item for approval...
+                </p>
               )}
-            </button>
+            </div>
           </motion.div>
         </form>
       </motion.div>

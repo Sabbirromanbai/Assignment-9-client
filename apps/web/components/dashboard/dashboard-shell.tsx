@@ -110,9 +110,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center border-b border-border/70 px-5">
-        <Link href="/" aria-label="PizzaHub home">
-          <Logo />
-        </Link>
+        <Logo />
       </div>
 
       <div className="px-4 py-5">

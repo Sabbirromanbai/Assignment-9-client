@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-import { PagePlaceholder } from "@/components/page-placeholder"
+import { SignInForm } from "@/components/auth/sign-in-form"
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -8,11 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function SignInPage() {
-  return (
-    <PagePlaceholder
-      eyebrow="Account"
-      title="Sign in is almost ready"
-      description="PizzaHub accounts are not connected yet. Sign-in will open together with the full ordering experience."
-    />
-  )
+  return <SignInForm />
 }

@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
 import { authClient } from "@/lib/auth-client"
+import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -61,6 +62,7 @@ function validate(values: SignUpValues) {
 export function SignUpForm() {
   const router = useRouter()
   const reduceMotion = useReducedMotion()
+  const { toast } = useToast()
   const [values, setValues] = React.useState<SignUpValues>({
     name: "",
     email: "",
@@ -73,13 +75,9 @@ export function SignUpForm() {
   >({})
   const [showPassword, setShowPassword] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [formError, setFormError] = React.useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFormError(null)
-    setSuccessMessage(null)
 
     const nextErrors = validate(values)
     setErrors(nextErrors)
@@ -99,15 +97,27 @@ export function SignUpForm() {
       } as any)
 
       if (error) {
-        setFormError(error.message || "Unable to create your account.")
+        toast({
+          variant: "error",
+          title: "Account creation failed",
+          description: error.message || "Unable to create your account.",
+        })
         return
       }
 
-      setSuccessMessage("Account created. Redirecting to PizzaHub.")
+      toast({
+        variant: "success",
+        title: "Account created",
+        description: "Welcome to PizzaHub. Redirecting now.",
+      })
       router.push("/")
       router.refresh()
     } catch {
-      setFormError("Unable to create your account. Please try again.")
+      toast({
+        variant: "error",
+        title: "Account creation failed",
+        description: "Unable to create your account. Please try again.",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -183,7 +193,7 @@ export function SignUpForm() {
         </motion.div>
 
         <motion.div
-          className="rounded-3xl border border-white/15 bg-background/88 p-6 shadow-elevated backdrop-blur-xl sm:p-8"
+          className="rounded-3xl border border-white/20 bg-background/78 p-6 shadow-elevated backdrop-blur-2xl sm:p-8"
           initial={reduceMotion ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
@@ -199,24 +209,6 @@ export function SignUpForm() {
               Create a customer or vendor account.
             </p>
           </div>
-
-          {formError ? (
-            <div
-              role="alert"
-              className="mb-6 rounded-xl border border-destructive/25 bg-destructive/8 px-4 py-3 text-sm text-destructive"
-            >
-              {formError}
-            </div>
-          ) : null}
-
-          {successMessage ? (
-            <div
-              role="status"
-              className="mb-6 rounded-xl border border-primary/25 bg-primary/8 px-4 py-3 text-sm text-primary"
-            >
-              {successMessage}
-            </div>
-          ) : null}
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <motion.div
@@ -236,7 +228,7 @@ export function SignUpForm() {
                 onChange={(event) => updateField("name", event.target.value)}
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? "sign-up-name-error" : undefined}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                 placeholder="Your name"
               />
               {errors.name ? (
@@ -263,7 +255,7 @@ export function SignUpForm() {
                 onChange={(event) => updateField("email", event.target.value)}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? "sign-up-email-error" : undefined}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                 placeholder="you@example.com"
               />
               {errors.email ? (
@@ -296,7 +288,7 @@ export function SignUpForm() {
                   aria-describedby={
                     errors.password ? "sign-up-password-error" : undefined
                   }
-                  className="h-11 w-full rounded-lg border border-input bg-background px-3 pr-11 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 pr-11 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                   placeholder="At least 6 characters"
                 />
                 <button
@@ -342,7 +334,7 @@ export function SignUpForm() {
                 }
                 aria-invalid={Boolean(errors.role)}
                 aria-describedby={errors.role ? "sign-up-role-error" : undefined}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
               >
                 <option value="customer">Customer</option>
                 <option value="vendor">Vendor</option>
@@ -375,7 +367,7 @@ export function SignUpForm() {
                 onChange={(event) => updateField("image", event.target.value)}
                 aria-invalid={Boolean(errors.image)}
                 aria-describedby={errors.image ? "sign-up-image-error" : undefined}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                 placeholder="https://..."
               />
               {errors.image ? (
@@ -397,8 +389,7 @@ export function SignUpForm() {
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  buttonVariants(),
-                  "h-11 w-full shadow-soft transition-all duration-300",
+                  "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
                   isSubmitting && "cursor-not-allowed opacity-70"
                 )}
               >

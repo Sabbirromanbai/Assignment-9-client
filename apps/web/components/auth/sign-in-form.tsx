@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
 import { authClient } from "@/lib/auth-client"
+import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -37,6 +38,7 @@ function validate(values: SignInValues) {
 export function SignInForm() {
   const router = useRouter()
   const reduceMotion = useReducedMotion()
+  const { toast } = useToast()
   const [values, setValues] = React.useState<SignInValues>({
     email: "",
     password: "",
@@ -46,11 +48,9 @@ export function SignInForm() {
   >({})
   const [showPassword, setShowPassword] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [formError, setFormError] = React.useState<string | null>(null)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFormError(null)
 
     const nextErrors = validate(values)
     setErrors(nextErrors)
@@ -67,14 +67,27 @@ export function SignInForm() {
       })
 
       if (error) {
-        setFormError(error.message || "Unable to sign in. Please try again.")
+        toast({
+          variant: "error",
+          title: "Sign in failed",
+          description: error.message || "Unable to sign in. Please try again.",
+        })
         return
       }
 
+      toast({
+        variant: "success",
+        title: "Welcome back",
+        description: "Signing you in to PizzaHub.",
+      })
       router.push("/")
       router.refresh()
     } catch {
-      setFormError("Unable to sign in. Please try again.")
+      toast({
+        variant: "error",
+        title: "Sign in failed",
+        description: "Unable to sign in. Please try again.",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -142,17 +155,27 @@ export function SignInForm() {
             Track orders, revisit favorites, and pick up where your last slice
             left off.
           </motion.p>
+          <motion.div
+            className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/85 backdrop-blur-md"
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.38 }}
+          >
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+            Wood-fired daily
+          </motion.div>
         </div>
       </motion.section>
 
       <motion.section
         aria-label="Sign in form"
-        className="flex items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-12"
+        className="relative flex items-center justify-center overflow-hidden bg-background/85 px-4 py-12 backdrop-blur-2xl sm:px-6 lg:px-12"
         initial={reduceMotion ? false : { opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="w-full max-w-md">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.545_0.21_27.5/0.08),transparent_45%)]" aria-hidden="true" />
+        <div className="relative w-full max-w-md rounded-3xl border border-border/60 bg-card/72 p-6 shadow-elevated backdrop-blur-2xl sm:p-8">
           <div className="mb-8">
             <p className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
               Account
@@ -164,15 +187,6 @@ export function SignInForm() {
               Use your email and password to access PizzaHub.
             </p>
           </div>
-
-          {formError ? (
-            <div
-              role="alert"
-              className="mb-6 rounded-xl border border-destructive/25 bg-destructive/8 px-4 py-3 text-sm text-destructive"
-            >
-              {formError}
-            </div>
-          ) : null}
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <motion.div
@@ -195,7 +209,7 @@ export function SignInForm() {
                 onChange={(event) => updateField("email", event.target.value)}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? "sign-in-email-error" : undefined}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                 placeholder="you@example.com"
               />
               {errors.email ? (
@@ -233,7 +247,7 @@ export function SignInForm() {
                   aria-describedby={
                     errors.password ? "sign-in-password-error" : undefined
                   }
-                  className="h-11 w-full rounded-lg border border-input bg-background px-3 pr-11 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 pr-11 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
                   placeholder="Enter your password"
                 />
                 <button
@@ -268,8 +282,7 @@ export function SignInForm() {
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  buttonVariants(),
-                  "h-11 w-full shadow-soft transition-all duration-300",
+                  "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
                   isSubmitting && "cursor-not-allowed opacity-70"
                 )}
               >

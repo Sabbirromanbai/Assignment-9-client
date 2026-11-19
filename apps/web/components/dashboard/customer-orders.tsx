@@ -19,6 +19,7 @@ import {
   type OrderStatus,
   type VendorProfile,
 } from "@/lib/api"
+import { OrderStatusTimeline } from "@/components/dashboard/order-status-timeline"
 import { useToast } from "@/components/toast-provider"
 
 type ViewStatus = "loading" | "success" | "empty" | "error"
@@ -336,6 +337,12 @@ export function CustomerOrders() {
                           </p>
                         ) : null}
                       </div>
+
+                      <OrderStatusTimeline
+                        status={order.status}
+                        createdAt={order.createdAt}
+                        className="mt-4 border-t border-border/60 pt-4"
+                      />
                     </div>
 
                     {isPending ? (

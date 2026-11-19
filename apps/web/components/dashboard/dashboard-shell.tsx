@@ -10,6 +10,7 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { Logo } from "@/components/logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useToast } from "@/components/toast-provider"
 import { authClient } from "@/lib/auth-client"
 import type { DashboardRole } from "@/lib/dashboard-nav"
@@ -241,7 +242,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
           >
             <Menu className="size-4" aria-hidden="true" />
           </button>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
               Dashboard
             </p>
@@ -249,6 +250,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
               {getPageTitle(pathname, role)}
             </h1>
           </div>
+          <ThemeToggle />
         </header>
 
         <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

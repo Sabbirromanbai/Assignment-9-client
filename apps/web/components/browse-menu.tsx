@@ -169,6 +169,7 @@ export function BrowseMenu({
   const [search, setSearch] = React.useState(initialSearch)
   const [category, setCategory] = React.useState(initialCategory)
   const [location, setLocation] = React.useState(initialLocation)
+  const [sort, setSort] = React.useState("")
 
   const [items, setItems] = React.useState<MenuItem[]>([])
   const [allItems, setAllItems] = React.useState<MenuItem[]>([])
@@ -207,6 +208,7 @@ export function BrowseMenu({
         if (search) filters.search = search
         if (category) filters.category = category
         if (location) filters.location = location
+        if (sort) filters.sort = sort as MenuFilters["sort"]
 
         const filtered = await fetchMenuItems(filters, controller.signal)
         const approved = filtered.filter((item) => item.status === "approved")
@@ -250,7 +252,7 @@ export function BrowseMenu({
     void load()
 
     return () => controller.abort()
-  }, [search, category, location, reloadKey])
+  }, [search, category, location, sort, reloadKey])
 
   const categories = React.useMemo(
     () =>
@@ -268,13 +270,14 @@ export function BrowseMenu({
     [allItems]
   )
 
-  const hasFilters = Boolean(searchInput || category || location)
+  const hasFilters = Boolean(searchInput || category || location || sort)
 
   function clearFilters() {
     setSearchInput("")
     setSearch("")
     setCategory("")
     setLocation("")
+    setSort("")
   }
 
   return (
@@ -293,7 +296,7 @@ export function BrowseMenu({
         </div>
       </div>
 
-      <div className="mt-8 grid gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
+      <div className="mt-8 grid gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_200px_200px_180px_auto]">
         <label className="relative block">
           <span className="sr-only">Search menu items</span>
           <Search
@@ -338,6 +341,20 @@ export function BrowseMenu({
                 {value}
               </option>
             ))}
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="sr-only">Sort by price</span>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value)}
+            aria-label="Sort by price"
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
+          >
+            <option value="">Newest first</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
           </select>
         </label>
 

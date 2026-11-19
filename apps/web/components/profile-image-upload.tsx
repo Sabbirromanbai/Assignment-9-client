@@ -5,8 +5,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { Upload, X } from "lucide-react"
 
 import { cn } from "@workspace/ui/lib/utils"
-import { API_BASE_URL } from "@/lib/api"
-import { authClient } from "@/lib/auth-client"
+import { API_BASE_URL, getAuthToken } from "@/lib/api"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 const MAX_SIZE = 5 * 1024 * 1024
@@ -17,6 +16,8 @@ type ProfileImageUploadProps = {
   onUploadingChange?: (uploading: boolean) => void
   disabled?: boolean
   endpoint?: string
+  /** Send the Better Auth bearer token (required by vendor-only endpoints). */
+  withAuth?: boolean
 }
 
 export function ProfileImageUpload({
@@ -25,6 +26,7 @@ export function ProfileImageUpload({
   onUploadingChange,
   disabled = false,
   endpoint = "/api/profile/images",
+  withAuth = false,
 }: ProfileImageUploadProps) {
   const reduceMotion = useReducedMotion()
   const inputRef = React.useRef<HTMLInputElement | null>(null)
@@ -86,12 +88,23 @@ export function ProfileImageUpload({
     setProgress(0)
     setUploading(true)
 
-    const tokenResp = await fetch(`${API_BASE_URL}/api/auth/token`, {
-      credentials: "include",
-      headers: { Accept: "application/json" },
-    })
-    const tokenData = (await tokenResp.json()) as { token?: string }
-    const token = tokenData?.token
+    let token: string | null = null
+    if (withAuth) {
+      try {
+        token = await getAuthToken()
+      } catch (tokenError) {
+        setError(
+          tokenError instanceof Error
+            ? tokenError.message
+            : "Your session expired. Please sign in again."
+        )
+        revokeObjectUrl()
+        setPreview(value ?? null)
+        setProgress(0)
+        setUploading(false)
+        return
+      }
+    }
 
     const xhr = new XMLHttpRequest()
     xhr.open("POST", `${API_BASE_URL}${endpoint}`)

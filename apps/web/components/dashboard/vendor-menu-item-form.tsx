@@ -2,15 +2,15 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowRight, Loader2, Pizza } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
 import { ProfileImageUpload } from "@/components/profile-image-upload"
-import { authClient } from "@/lib/auth-client"
 import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
-import { createMenuItem, fetchUploadMenuImage, type MenuItem } from "@/lib/api"
+import { createMenuItem } from "@/lib/api"
 import { PIZZA_CATEGORIES, type PizzaCategory } from "@/lib/dashboard-nav"
 
 type MenuItemValues = {
@@ -65,6 +65,7 @@ function validate(values: MenuItemValues) {
 }
 
 export function VendorMenuItemForm() {
+  const router = useRouter()
   const reduceMotion = useReducedMotion()
   const { toast } = useToast()
   const [values, setValues] = React.useState<MenuItemValues>({
@@ -80,9 +81,6 @@ export function VendorMenuItemForm() {
   >({})
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isImageUploading, setIsImageUploading] = React.useState(false)
-  const [uploadedImageUrl, setUploadedImageUrl] = React.useState<string | null>(
-    null
-  )
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -93,25 +91,22 @@ export function VendorMenuItemForm() {
       return
     }
 
-    if (!values.image) {
-      setErrors({ ...errors, image: "A menu item image is required." })
+    const image = values.image
+    if (!image) {
       return
     }
 
     setIsSubmitting(true)
 
     try {
-      const created = await createMenuItem(
-        {
-          itemName: values.itemName.trim(),
-          category: values.category,
-          description: values.description.trim(),
-          price: parseFloat(values.price),
-          location: values.location.trim(),
-          images: [values.image],
-        },
-        undefined
-      )
+      const created = await createMenuItem({
+        itemName: values.itemName.trim(),
+        category: values.category,
+        description: values.description.trim(),
+        price: parseFloat(values.price),
+        location: values.location.trim(),
+        images: [image],
+      })
 
       toast({
         variant: "success",
@@ -128,33 +123,19 @@ export function VendorMenuItemForm() {
         location: "",
         image: null,
       })
-      setUploadedImageUrl(null)
-    } catch {
+      setErrors({})
+      router.push("/dashboard/vendor/menu-items")
+    } catch (error) {
       toast({
         variant: "error",
         title: "Failed to create menu item",
-        description: "Unable to create the menu item. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Unable to create the menu item. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  async function handleImageUpload(file: File) {
-    setIsImageUploading(true)
-    setErrors((prev) => ({ ...prev, image: undefined }))
-
-    try {
-      const url = await fetchUploadMenuImage(file)
-      setValues((current) => ({ ...current, image: url }))
-      setUploadedImageUrl(url)
-    } catch {
-      setErrors((prev) => ({
-        ...prev,
-        image: "Image upload failed. Please try again.",
-      }))
-    } finally {
-      setIsImageUploading(false)
     }
   }
 
@@ -362,7 +343,13 @@ export function VendorMenuItemForm() {
               onUploadingChange={setIsImageUploading}
               onChange={(url) => updateField("image", url ?? "")}
               endpoint="/api/menu/images"
+              withAuth
             />
+            {errors.image ? (
+              <p role="alert" className="mt-2 text-sm text-destructive">
+                {errors.image}
+              </p>
+            ) : null}
           </motion.div>
 
           <motion.div

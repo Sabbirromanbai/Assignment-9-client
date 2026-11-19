@@ -120,7 +120,7 @@ type ApiEnvelope<T> = {
   data: T
 }
 
-async function getAuthToken(signal?: AbortSignal): Promise<string> {
+export async function getAuthToken(signal?: AbortSignal): Promise<string> {
   const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
     signal,
     credentials: "include",
@@ -165,6 +165,7 @@ export async function fetchWithAuth<T>(
   })
 
   const payload: unknown = await response.json().catch(() => null)
+  const method = (init.method ?? "GET").toUpperCase()
 
   if (!response.ok) {
     const message =
@@ -178,7 +179,24 @@ export async function fetchWithAuth<T>(
     throw new Error(message)
   }
 
-  if (!payload || typeof payload !== "object" || !("data" in payload)) {
+  // Some endpoints (for example DELETE) return only a message and no data.
+  if (!payload || typeof payload !== "object") {
+    if (method === "DELETE") {
+      return { data: undefined as T }
+    }
+    throw new Error("Unexpected API response shape")
+  }
+
+  if (!("data" in payload)) {
+    if (method === "DELETE") {
+      return {
+        message:
+          typeof (payload as { message?: unknown }).message === "string"
+            ? (payload as { message: string }).message
+            : undefined,
+        data: undefined as T,
+      }
+    }
     throw new Error("Unexpected API response shape")
   }
 
@@ -253,7 +271,7 @@ export async function fetchVendorMenuItems(
   signal?: AbortSignal
 ): Promise<MenuItem[]> {
   const response = await fetchWithAuth<MenuItem[]>(
-    "/api/vendors/menu-items",
+    "/api/menu/mine",
     {},
     signal
   )
@@ -275,7 +293,7 @@ export async function updateMenuItem(
   const response = await fetchWithAuth<MenuItem>(
     `/api/menu/${id}`,
     {
-      method: "PATCH",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     },
@@ -302,7 +320,7 @@ export async function toggleMenuItemAvailability(
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ available }),
+      body: JSON.stringify({ active: available }),
     },
     signal
   )

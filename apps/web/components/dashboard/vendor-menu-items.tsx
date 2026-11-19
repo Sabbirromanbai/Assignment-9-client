@@ -28,9 +28,9 @@ import {
   fetchVendorMenuItems,
   updateMenuItem,
   deleteMenuItem,
+  toggleMenuItemAvailability,
   type MenuItem,
   type UpdateMenuItemInput,
-  fetchUploadMenuImage,
 } from "@/lib/api"
 import { PIZZA_CATEGORIES, type PizzaCategory } from "@/lib/dashboard-nav"
 import { ProfileImageUpload } from "@/components/profile-image-upload"
@@ -260,6 +260,7 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
     if (!values.location.trim()) errs.location = "Location is required."
     else if (values.location.trim().length > 200)
       errs.location = "Location must be 200 characters or fewer."
+    if (!values.image) errs.image = "A menu item image is required."
     return errs
   }
 
@@ -400,6 +401,11 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
                   {cat}
                 </option>
               ))}
+              {!(PIZZA_CATEGORIES as readonly string[]).includes(
+                values.category
+              ) ? (
+                <option value={values.category}>{values.category}</option>
+              ) : null}
             </select>
             {errors.category ? (
               <p className="mt-2 text-sm text-destructive">{errors.category}</p>
@@ -494,7 +500,13 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
               onUploadingChange={setIsImageUploading}
               onChange={(url) => update("image", url ?? "")}
               endpoint="/api/menu/images"
+              withAuth
             />
+            {errors.image ? (
+              <p role="alert" className="mt-2 text-sm text-destructive">
+                {errors.image}
+              </p>
+            ) : null}
           </div>
 
           {/* Actions */}
@@ -772,17 +784,10 @@ export function VendorMenuItems() {
     setIsTogglingAvailability(true)
     setTogglingId(availabilityItem._id)
     try {
-      // PATCH /api/menu/:id/availability with { available: boolean }
-      const { fetchWithAuth } = await import("@/lib/api")
-      const response = await fetchWithAuth<MenuItem>(
-        `/api/menu/${availabilityItem._id}/availability`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ available: !isCurrentlyActive }),
-        }
+      const updated = await toggleMenuItemAvailability(
+        availabilityItem._id,
+        !isCurrentlyActive
       )
-      const updated = response.data
       setItems((prev) =>
         prev.map((it) => (it._id === updated._id ? updated : it))
       )
@@ -790,8 +795,10 @@ export function VendorMenuItems() {
         variant: "success",
         title: isCurrentlyActive
           ? "Item marked inactive"
-          : "Item marked active",
-        description: `${updated.itemName} is now ${updated.status}.`,
+          : "Item submitted for approval",
+        description: isCurrentlyActive
+          ? `${updated.itemName} is now hidden from customers.`
+          : `${updated.itemName} will appear to customers again after approval.`,
       })
     } catch (err) {
       toast({
@@ -978,17 +985,17 @@ export function VendorMenuItems() {
         title={
           availabilityItem?.status === "approved"
             ? "Mark item as inactive"
-            : "Mark item as active"
+            : "Reactivate menu item"
         }
         description={
           availabilityItem?.status === "approved"
             ? `"${availabilityItem?.itemName}" will be hidden from the public menu until you reactivate it.`
-            : `"${availabilityItem?.itemName}" will be visible to customers again.`
+            : `"${availabilityItem?.itemName}" will be submitted for approval before it appears to customers again.`
         }
         confirmLabel={
           availabilityItem?.status === "approved"
             ? "Mark inactive"
-            : "Mark active"
+            : "Submit for approval"
         }
         onConfirm={handleConfirmToggle}
         onCancel={() => setAvailabilityItem(null)}

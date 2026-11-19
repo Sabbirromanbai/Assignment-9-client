@@ -21,11 +21,21 @@ type DashboardShellProps = {
   children: React.ReactNode
 }
 
+function resolveNavItem(pathname: string, role: DashboardRole) {
+  const navItems = DASHBOARD_NAV[role]
+  const exactMatch = navItems.find((navItem) => navItem.href === pathname)
+
+  if (exactMatch) {
+    return exactMatch
+  }
+
+  return navItems
+    .filter((navItem) => pathname.startsWith(`${navItem.href}/`))
+    .sort((a, b) => b.href.length - a.href.length)[0]
+}
+
 function getPageTitle(pathname: string, role: DashboardRole) {
-  const item = DASHBOARD_NAV[role].find(
-    (navItem) => navItem.href === pathname
-  )
-  return item?.label ?? "Dashboard"
+  return resolveNavItem(pathname, role)?.label ?? "Dashboard"
 }
 
 export function DashboardShell({ role, user, children }: DashboardShellProps) {
@@ -106,6 +116,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
     .toUpperCase()
 
   const navItems = DASHBOARD_NAV[role]
+  const activeHref = resolveNavItem(pathname, role)?.href
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
@@ -140,7 +151,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
       <nav aria-label="Dashboard" className="flex-1 space-y-1 px-3">
         {navItems.map((item) => {
           const Icon = item.icon
-          const active = pathname === item.href
+          const active = activeHref === item.href
 
           return (
             <Link

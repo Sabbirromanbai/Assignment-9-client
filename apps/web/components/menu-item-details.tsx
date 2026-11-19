@@ -5,6 +5,9 @@ import Image from "next/image"
 import Link from "next/link"
 import {
   ArrowRight,
+  Calendar,
+  CheckCircle2,
+  Loader2,
   MapPin,
   Pizza,
   RefreshCw,
@@ -16,11 +19,14 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import {
+  createOrder,
   fetchMenuItems,
   fetchVendorProfile,
   type MenuItem,
   type VendorProfile,
 } from "@/lib/api"
+import { useAuthSession } from "@/lib/auth"
+import { useToast } from "@/components/toast-provider"
 
 type MenuItemDetailsProps = {
   id: string
@@ -54,6 +60,9 @@ function DetailSkeleton() {
 
 export function MenuItemDetails({ id }: MenuItemDetailsProps) {
   const reduceMotion = useReducedMotion()
+  const { isPending: sessionPending, isAuthenticated, role } = useAuthSession()
+  const { toast } = useToast()
+
   const [item, setItem] = React.useState<MenuItem | null>(null)
   const [vendor, setVendor] = React.useState<VendorProfile | null>(null)
   const [selectedImage, setSelectedImage] = React.useState(0)
@@ -63,6 +72,15 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
   >("loading")
   const [error, setError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
+
+  const [orderValues, setOrderValues] = React.useState({
+    deliveryDate: "",
+    deliveryAddress: "",
+    message: "",
+  })
+  const [orderErrors, setOrderErrors] = React.useState<Record<string, string>>({})
+  const [isSubmittingOrder, setIsSubmittingOrder] = React.useState(false)
+  const [orderSuccess, setOrderSuccess] = React.useState(false)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -123,6 +141,78 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
 
     return () => controller.abort()
   }, [id, reloadKey])
+
+  function validateOrder() {
+    const errors: Record<string, string> = {}
+
+    if (!orderValues.deliveryDate) {
+      errors.deliveryDate = "Delivery date is required."
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(orderValues.deliveryDate)) {
+      errors.deliveryDate = "Enter a valid delivery date."
+    }
+
+    const address = orderValues.deliveryAddress.trim()
+    if (!address) {
+      errors.deliveryAddress = "Delivery address is required."
+    } else if (address.length > 1000) {
+      errors.deliveryAddress = "Address must be 1000 characters or fewer."
+    }
+
+    if (orderValues.message.length > 1000) {
+      errors.message = "Message must be 1000 characters or fewer."
+    }
+
+    setOrderErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  function friendlyOrderError(message: string) {
+    if (message.includes("active order already exists")) {
+      return "An active order already exists for this item and delivery date."
+    }
+    if (message.includes("Vendors cannot order")) {
+      return "Vendors cannot order their own items."
+    }
+    if (message.includes("approved and active")) {
+      return "This item is not currently available to order."
+    }
+    if (message.includes("Item not found")) {
+      return "This item is no longer available."
+    }
+    return message
+  }
+
+  async function handleOrderSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!validateOrder()) return
+
+    setIsSubmittingOrder(true)
+    setOrderSuccess(false)
+    try {
+      await createOrder({
+        itemId: id,
+        deliveryDate: orderValues.deliveryDate,
+        deliveryAddress: orderValues.deliveryAddress.trim(),
+        message: orderValues.message.trim() || undefined,
+      })
+      setOrderSuccess(true)
+      setOrderErrors({})
+      toast({
+        variant: "success",
+        title: "Order placed",
+        description: "Your order has been submitted for vendor review.",
+      })
+    } catch (caughtError) {
+      const message =
+        caughtError instanceof Error
+          ? friendlyOrderError(caughtError.message)
+          : "Unable to place your order. Please try again."
+      setOrderErrors({ form: message })
+      toast({ variant: "error", title: "Order failed", description: message })
+    } finally {
+      setIsSubmittingOrder(false)
+    }
+  }
 
   const images = item?.images ?? []
   const activeImage = images[selectedImage] ?? images[0]
@@ -310,17 +400,172 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
             <h2 className="font-heading text-lg font-semibold tracking-tight">
               Order option
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Delivery date, address, and special instructions are required to
-              place an order. Sign in to continue with ordering.
-            </p>
-            <Link
-              href="/sign-in"
-              className={cn(buttonVariants(), "mt-4 shadow-soft")}
-            >
-              Sign in to order
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
+
+            {sessionPending ? (
+              <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Checking your session...
+              </p>
+            ) : !isAuthenticated ? (
+              <>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Delivery date, address, and special instructions are required
+                  to place an order. Sign in to continue.
+                </p>
+                <Link
+                  href={`/sign-in?callbackURL=${encodeURIComponent(`/menu/${id}`)}`}
+                  className={cn(buttonVariants(), "mt-4 shadow-soft")}
+                >
+                  Sign in to order
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </>
+            ) : role !== "customer" ? (
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Ordering is available to customers only.
+              </p>
+            ) : orderSuccess ? (
+              <div className="mt-3 space-y-3">
+                <p className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                  <CheckCircle2 className="size-5" aria-hidden="true" />
+                  Your order has been placed.
+                </p>
+                <Link
+                  href="/dashboard/customer/orders"
+                  className={cn(buttonVariants({ variant: "outline" }))}
+                >
+                  View my orders
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </div>
+            ) : (
+              <form onSubmit={handleOrderSubmit} className="mt-4 space-y-4" noValidate>
+                <div>
+                  <label
+                    htmlFor="order-delivery-date"
+                    className="mb-2 block text-sm font-medium"
+                  >
+                    Delivery date
+                  </label>
+                  <div className="relative">
+                    <Calendar
+                      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="order-delivery-date"
+                      type="date"
+                      value={orderValues.deliveryDate}
+                      onChange={(event) => {
+                        setOrderValues((current) => ({
+                          ...current,
+                          deliveryDate: event.target.value,
+                        }))
+                        setOrderErrors((prev) => ({ ...prev, deliveryDate: "" }))
+                      }}
+                      aria-invalid={Boolean(orderErrors.deliveryDate)}
+                      aria-describedby={
+                        orderErrors.deliveryDate ? "order-date-error" : undefined
+                      }
+                      className="h-11 w-full rounded-lg border border-border/70 bg-background/70 pl-10 pr-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary/25"
+                    />
+                  </div>
+                  {orderErrors.deliveryDate ? (
+                    <p id="order-date-error" className="mt-2 text-sm text-destructive">
+                      {orderErrors.deliveryDate}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="order-delivery-address"
+                    className="mb-2 block text-sm font-medium"
+                  >
+                    Delivery address
+                  </label>
+                  <textarea
+                    id="order-delivery-address"
+                    rows={3}
+                    value={orderValues.deliveryAddress}
+                    onChange={(event) => {
+                      setOrderValues((current) => ({
+                        ...current,
+                        deliveryAddress: event.target.value,
+                      }))
+                      setOrderErrors((prev) => ({ ...prev, deliveryAddress: "" }))
+                    }}
+                    aria-invalid={Boolean(orderErrors.deliveryAddress)}
+                    aria-describedby={
+                      orderErrors.deliveryAddress
+                        ? "order-address-error"
+                        : undefined
+                    }
+                    className="w-full rounded-lg border border-border/70 bg-background/70 px-3 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/25"
+                    placeholder="Street address, city, and ZIP code"
+                  />
+                  {orderErrors.deliveryAddress ? (
+                    <p id="order-address-error" className="mt-2 text-sm text-destructive">
+                      {orderErrors.deliveryAddress}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="order-message"
+                    className="mb-2 block text-sm font-medium"
+                  >
+                    Message <span className="text-muted-foreground">(optional)</span>
+                  </label>
+                  <textarea
+                    id="order-message"
+                    rows={2}
+                    value={orderValues.message}
+                    onChange={(event) => {
+                      setOrderValues((current) => ({
+                        ...current,
+                        message: event.target.value,
+                      }))
+                      setOrderErrors((prev) => ({ ...prev, message: "" }))
+                    }}
+                    aria-invalid={Boolean(orderErrors.message)}
+                    className="w-full rounded-lg border border-border/70 bg-background/70 px-3 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/25"
+                    placeholder="Special instructions for the kitchen"
+                  />
+                  {orderErrors.message ? (
+                    <p className="mt-2 text-sm text-destructive">{orderErrors.message}</p>
+                  ) : null}
+                </div>
+
+                {orderErrors.form ? (
+                  <p role="alert" className="text-sm text-destructive">
+                    {orderErrors.form}
+                  </p>
+                ) : null}
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingOrder}
+                  className={cn(
+                    "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
+                    isSubmittingOrder && "cursor-not-allowed opacity-70"
+                  )}
+                >
+                  {isSubmittingOrder ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                      Placing order...
+                    </>
+                  ) : (
+                    <>
+                      Place order
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

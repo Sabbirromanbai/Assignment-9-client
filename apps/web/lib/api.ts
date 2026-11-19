@@ -526,6 +526,30 @@ export type Order = {
   createdAt?: string
 }
 
+export type CreateOrderInput = {
+  itemId: string
+  deliveryDate: string
+  deliveryAddress: string
+  message?: string
+}
+
+export async function createOrder(
+  input: CreateOrderInput,
+  signal?: AbortSignal
+): Promise<Order> {
+  const response = await fetchWithAuth<Order>(
+    "/api/orders",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    signal
+  )
+
+  return response.data
+}
+
 export async function fetchMyOrders(signal?: AbortSignal): Promise<Order[]> {
   const response = await fetchWithAuth<Order[]>("/api/orders/mine", {}, signal)
 

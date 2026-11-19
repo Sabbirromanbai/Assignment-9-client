@@ -86,6 +86,29 @@ export async function fetchMenuItems(
   return (payload as { data: MenuItem[] }).data
 }
 
+export type UpdateVendorProfileInput = {
+  name?: string
+  businessName?: string
+  image?: string
+}
+
+export async function updateVendorProfile(
+  input: UpdateVendorProfileInput,
+  signal?: AbortSignal
+): Promise<VendorProfile> {
+  const response = await fetchWithAuth<VendorProfile>(
+    "/api/vendors/profile",
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    signal
+  )
+
+  return response.data
+}
+
 export async function fetchVendorProfile(
   vendorId: string,
   signal?: AbortSignal

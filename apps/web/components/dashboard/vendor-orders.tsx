@@ -107,6 +107,9 @@ export function VendorOrders() {
 
   const [orders, setOrders] = React.useState<Order[]>([])
   const [items, setItems] = React.useState<Record<string, MenuItem>>({})
+  const [failedImages, setFailedImages] = React.useState<Set<string>>(
+    new Set()
+  )
   const [status, setStatus] = React.useState<ViewStatus>("loading")
   const [error, setError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
@@ -262,12 +265,15 @@ export function VendorOrders() {
                 >
                   <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:gap-5 sm:p-5">
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
-                      {image ? (
+                      {image && !failedImages.has(order._id) ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={image}
                           alt={item?.itemName ?? "Ordered item"}
                           className="size-full object-cover"
+                          onError={() =>
+                            setFailedImages((prev) => new Set(prev).add(order._id))
+                          }
                         />
                       ) : (
                         <div className="grid h-full place-items-center text-muted-foreground">

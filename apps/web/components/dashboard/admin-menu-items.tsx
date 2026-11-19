@@ -52,6 +52,9 @@ export function AdminMenuItems() {
   const { toast } = useToast()
 
   const [items, setItems] = React.useState<MenuItem[]>([])
+  const [failedImages, setFailedImages] = React.useState<Set<string>>(
+    new Set()
+  )
   const [status, setStatus] = React.useState<ViewStatus>("loading")
   const [error, setError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
@@ -236,12 +239,15 @@ export function AdminMenuItems() {
                 >
                   <div className="flex min-w-0 items-start gap-4">
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
-                      {image ? (
+                      {image && !failedImages.has(item._id) ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={image}
                           alt={item.itemName}
                           className="size-full object-cover"
+                          onError={() =>
+                            setFailedImages((prev) => new Set(prev).add(item._id))
+                          }
                         />
                       ) : (
                         <div className="grid h-full place-items-center text-muted-foreground">

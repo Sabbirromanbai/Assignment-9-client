@@ -86,13 +86,14 @@ export function SignUpForm() {
     setIsSubmitting(true)
 
     try {
-      const { data, error } = await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         name: values.name.trim(),
         email: values.email.trim(),
         password: values.password,
+        // @ts-expect-error – better-auth extended fields (role, image) not in base type
         role: values.role,
         image: values.image.trim() || undefined,
-      } as any)
+      })
 
       if (error) {
         toast({

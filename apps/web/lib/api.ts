@@ -203,6 +203,38 @@ export async function fetchWithAuth<T>(
   return payload as ApiEnvelope<T>
 }
 
+export type CustomerDashboardData = {
+  totalOrders: number
+  pendingOrders: number
+  acceptedOrders: number
+  rejectedOrders: number
+}
+
+export async function fetchCustomerDashboard(
+  signal?: AbortSignal
+): Promise<CustomerDashboardData> {
+  const response = await fetchWithAuth<CustomerDashboardData>(
+    "/api/customers/dashboard",
+    {},
+    signal
+  )
+
+  return response.data
+}
+
+export async function cancelOrder(
+  id: string,
+  signal?: AbortSignal
+): Promise<Order> {
+  const response = await fetchWithAuth<Order>(
+    `/api/orders/${id}/cancel`,
+    { method: "PATCH" },
+    signal
+  )
+
+  return response.data
+}
+
 export async function fetchVendorDashboard(
   signal?: AbortSignal
 ): Promise<VendorDashboardData> {

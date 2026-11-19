@@ -283,6 +283,48 @@ export async function fetchVendorMenuItems(
   return response.data
 }
 
+export type OrderStatus = "pending" | "accepted" | "rejected" | "cancelled"
+
+export type Order = {
+  _id: string
+  itemId: string
+  vendorId: string
+  customerId: string
+  deliveryDate: string
+  deliveryAddress: string
+  message: string
+  status: OrderStatus
+  createdAt?: string
+}
+
+export async function fetchMyOrders(signal?: AbortSignal): Promise<Order[]> {
+  const response = await fetchWithAuth<Order[]>("/api/orders/mine", {}, signal)
+
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected orders response shape")
+  }
+
+  return response.data
+}
+
+export async function updateOrderStatus(
+  id: string,
+  status: "accepted" | "rejected",
+  signal?: AbortSignal
+): Promise<Order> {
+  const response = await fetchWithAuth<Order>(
+    `/api/orders/${id}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    },
+    signal
+  )
+
+  return response.data
+}
+
 export type UpdateMenuItemInput = Partial<CreateMenuItemInput>
 
 export async function updateMenuItem(

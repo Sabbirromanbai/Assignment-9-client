@@ -16,7 +16,7 @@ type ProfileImageUploadProps = {
   onUploadingChange?: (uploading: boolean) => void
   disabled?: boolean
   endpoint?: string
-  /** Send the Better Auth bearer token (required by vendor-only endpoints). */
+  /** Send the Better Auth bearer token (required by authenticated endpoints). */
   withAuth?: boolean
 }
 
@@ -25,9 +25,11 @@ export function ProfileImageUpload({
   onChange,
   onUploadingChange,
   disabled = false,
-  endpoint = "/api/profile/images",
+  endpoint,
   withAuth = false,
 }: ProfileImageUploadProps) {
+  const resolvedEndpoint =
+    endpoint ?? (withAuth ? "/api/profile/images/authenticated" : "/api/profile/images")
   const reduceMotion = useReducedMotion()
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const objectUrlRef = React.useRef<string | null>(null)
@@ -107,7 +109,7 @@ export function ProfileImageUpload({
     }
 
     const xhr = new XMLHttpRequest()
-    xhr.open("POST", `${API_BASE_URL}${endpoint}`)
+    xhr.open("POST", `${API_BASE_URL}${resolvedEndpoint}`)
     xhr.setRequestHeader("Content-Type", file.type)
     xhr.setRequestHeader("X-File-Name", file.name)
     if (token) {

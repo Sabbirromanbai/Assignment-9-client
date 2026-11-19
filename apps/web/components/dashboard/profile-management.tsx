@@ -216,7 +216,7 @@ export function ProfileManagement() {
                 disabled={isSubmitting || isImageUploading}
                 onUploadingChange={setIsImageUploading}
                 onChange={(url) => updateField("image", url)}
-                endpoint="/api/profile/images"
+                withAuth
               />
             </div>
 

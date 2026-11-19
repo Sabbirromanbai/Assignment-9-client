@@ -248,3 +248,64 @@ export async function fetchUploadMenuImage(
 
   return response.data.url
 }
+
+export async function fetchVendorMenuItems(
+  signal?: AbortSignal
+): Promise<MenuItem[]> {
+  const response = await fetchWithAuth<MenuItem[]>(
+    "/api/vendors/menu-items",
+    {},
+    signal
+  )
+
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected vendor menu items response shape")
+  }
+
+  return response.data
+}
+
+export type UpdateMenuItemInput = Partial<CreateMenuItemInput>
+
+export async function updateMenuItem(
+  id: string,
+  input: UpdateMenuItemInput,
+  signal?: AbortSignal
+): Promise<MenuItem> {
+  const response = await fetchWithAuth<MenuItem>(
+    `/api/menu/${id}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    signal
+  )
+
+  return response.data
+}
+
+export async function deleteMenuItem(
+  id: string,
+  signal?: AbortSignal
+): Promise<void> {
+  await fetchWithAuth<unknown>(`/api/menu/${id}`, { method: "DELETE" }, signal)
+}
+
+export async function toggleMenuItemAvailability(
+  id: string,
+  available: boolean,
+  signal?: AbortSignal
+): Promise<MenuItem> {
+  const response = await fetchWithAuth<MenuItem>(
+    `/api/menu/${id}/availability`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ available }),
+    },
+    signal
+  )
+
+  return response.data
+}

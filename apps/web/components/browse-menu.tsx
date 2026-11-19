@@ -296,7 +296,7 @@ export function BrowseMenu({
         </div>
       </div>
 
-      <div className="mt-8 grid gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_200px_200px_180px_auto]">
+      <div className="mt-8 grid gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_200px_180px_auto]">
         <label className="relative block">
           <span className="sr-only">Search menu items</span>
           <Search
@@ -310,22 +310,6 @@ export function BrowseMenu({
             placeholder="Search by name"
             className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
           />
-        </label>
-
-        <label className="block">
-          <span className="sr-only">Filter by category</span>
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
-          >
-            <option value="">All categories</option>
-            {categories.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
         </label>
 
         <label className="block">
@@ -368,6 +352,44 @@ export function BrowseMenu({
           Clear filters
         </Button>
       </div>
+
+      {categories.length > 0 ? (
+        <div
+          className="mt-6 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filter by category"
+        >
+          <button
+            type="button"
+            onClick={() => setCategory("")}
+            aria-pressed={category === ""}
+            className={cn(
+              "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+              category === ""
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border/70 bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
+            )}
+          >
+            All
+          </button>
+          {categories.map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setCategory(value)}
+              aria-pressed={category === value}
+              className={cn(
+                "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                category === value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border/70 bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="mt-10">
         {status === "loading" ? <MenuSkeleton /> : null}

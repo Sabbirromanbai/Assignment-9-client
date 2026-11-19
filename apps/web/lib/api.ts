@@ -327,6 +327,152 @@ export async function fetchUploadMenuImage(
   return response.data.url
 }
 
+export type AdminDashboardData = {
+  totalUsers: number
+  vendors: number
+  customers: number
+  totalMenuItems: number
+  pendingMenuItems: number
+  totalTransactions: number
+}
+
+export type AdminUser = {
+  _id: string
+  name: string
+  email: string
+  image?: string | null
+  role: "vendor" | "customer" | "admin"
+  isBlocked: boolean
+  businessName?: string | null
+  subscriptionPlan?: string
+  subscriptionExpiresAt?: string | null
+  createdAt?: string
+}
+
+export type Transaction = {
+  _id: string
+  vendorId: string
+  plan: string
+  amount: number
+  currency: string
+  stripeSessionId: string
+  stripeSubscriptionId: string | null
+  status: string
+  createdAt?: string
+}
+
+export type AdminMenuFilters = {
+  status?: string
+  plan?: string
+  vendorId?: string
+}
+
+export async function fetchAdminDashboard(
+  signal?: AbortSignal
+): Promise<AdminDashboardData> {
+  const response = await fetchWithAuth<AdminDashboardData>(
+    "/api/admin/dashboard",
+    {},
+    signal
+  )
+  return response.data
+}
+
+export async function fetchAdminUsers(
+  filters: { role?: string; search?: string } = {},
+  signal?: AbortSignal
+): Promise<AdminUser[]> {
+  const params = new URLSearchParams()
+  if (filters.role) params.set("role", filters.role)
+  if (filters.search?.trim()) params.set("search", filters.search.trim())
+  const query = params.toString()
+  const response = await fetchWithAuth<AdminUser[]>(
+    `/api/admin/users${query ? `?${query}` : ""}`,
+    {},
+    signal
+  )
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected admin users response shape")
+  }
+  return response.data
+}
+
+export async function setUserBlocked(
+  id: string,
+  blocked: boolean,
+  signal?: AbortSignal
+): Promise<void> {
+  await fetchWithAuth<unknown>(
+    `/api/admin/users/${id}/block`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blocked }),
+    },
+    signal
+  )
+}
+
+export async function fetchAdminTransactions(
+  filters: AdminMenuFilters = {},
+  signal?: AbortSignal
+): Promise<Transaction[]> {
+  const params = new URLSearchParams()
+  if (filters.status?.trim()) params.set("status", filters.status.trim())
+  if (filters.plan?.trim()) params.set("plan", filters.plan.trim())
+  if (filters.vendorId?.trim()) params.set("vendorId", filters.vendorId.trim())
+  const query = params.toString()
+  const response = await fetchWithAuth<Transaction[]>(
+    `/api/admin/transactions${query ? `?${query}` : ""}`,
+    {},
+    signal
+  )
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected transactions response shape")
+  }
+  return response.data
+}
+
+export async function fetchAdminMenuItems(signal?: AbortSignal): Promise<MenuItem[]> {
+  const response = await fetchWithAuth<MenuItem[]>("/api/menu/admin", {}, signal)
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected admin menu items response shape")
+  }
+  return response.data
+}
+
+export async function fetchPendingMenuItems(signal?: AbortSignal): Promise<MenuItem[]> {
+  const response = await fetchWithAuth<MenuItem[]>("/api/menu/admin/pending", {}, signal)
+  if (!Array.isArray(response.data)) {
+    throw new Error("Unexpected pending menu items response shape")
+  }
+  return response.data
+}
+
+export async function updateAdminMenuItemStatus(
+  id: string,
+  status: "pending" | "approved" | "rejected" | "inactive",
+  signal?: AbortSignal
+): Promise<MenuItem> {
+  const response = await fetchWithAuth<MenuItem>(
+    `/api/menu/admin/${id}/status`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    },
+    signal
+  )
+  return response.data
+}
+
+export async function deleteAdminMenuItem(
+  id: string,
+  signal?: AbortSignal
+): Promise<void> {
+  await fetchWithAuth<unknown>(`/api/menu/admin/${id}`, { method: "DELETE" }, signal)
+}
+
 export async function fetchVendorMenuItems(
   signal?: AbortSignal
 ): Promise<MenuItem[]> {

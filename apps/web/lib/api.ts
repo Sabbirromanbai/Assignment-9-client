@@ -215,6 +215,34 @@ export async function fetchVendorDashboard(
   return response.data
 }
 
+export async function createCheckoutSession(
+  signal?: AbortSignal
+): Promise<string> {
+  const response = await fetchWithAuth<{ url: string }>(
+    "/api/subscriptions/checkout",
+    { method: "POST" },
+    signal
+  )
+
+  if (!response.data || typeof response.data.url !== "string") {
+    throw new Error("Checkout session did not return a redirect URL")
+  }
+
+  return response.data.url
+}
+
+export async function cancelPremiumSubscription(
+  signal?: AbortSignal
+): Promise<{ cancelAt: number | null }> {
+  const response = await fetchWithAuth<{ cancelAt: number | null }>(
+    "/api/subscriptions/cancel",
+    { method: "POST" },
+    signal
+  )
+
+  return response.data
+}
+
 export type CreateMenuItemInput = {
   itemName: string
   category: string

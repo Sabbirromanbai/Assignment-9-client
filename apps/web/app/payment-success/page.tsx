@@ -5,7 +5,7 @@ import { PaymentSuccess } from "@/components/payment-success"
 
 export const metadata: Metadata = {
   title: "Payment Success",
-  description: "Your PizzaHub payment confirmation.",
+  description: "Your Pizzabari payment confirmation.",
 }
 
 export default function PaymentSuccessPage() {

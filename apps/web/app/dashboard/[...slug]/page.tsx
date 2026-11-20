@@ -4,7 +4,7 @@ import { PagePlaceholder } from "@/components/page-placeholder"
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "PizzaHub dashboard page.",
+  description: "Pizzabari dashboard page.",
 }
 
 export default function DashboardPlaceholderPage() {

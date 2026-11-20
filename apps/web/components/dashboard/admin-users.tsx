@@ -287,8 +287,8 @@ export function AdminUsers() {
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               {nextBlocked
-                ? `${confirm.name} will no longer be able to access PizzaHub.`
-                : `${confirm.name} will regain access to PizzaHub.`}
+                ? `${confirm.name} will no longer be able to access Pizzabari.`
+                : `${confirm.name} will regain access to Pizzabari.`}
             </p>
             <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
               <button

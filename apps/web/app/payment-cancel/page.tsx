@@ -6,7 +6,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 export const metadata: Metadata = {
   title: "Payment Cancelled",
-  description: "Your PizzaHub checkout was cancelled.",
+  description: "Your Pizzabari checkout was cancelled.",
 }
 
 export default function PaymentCancelPage() {

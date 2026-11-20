@@ -93,7 +93,7 @@ export function PaymentSuccess() {
             Premium activated
           </h1>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">
-            Your PizzaHub Premium plan is now active. You can publish unlimited
+            Your Pizzabari Premium plan is now active. You can publish unlimited
             menu items with featured placement.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">

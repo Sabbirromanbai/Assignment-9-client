@@ -24,7 +24,7 @@ const features = [
   },
 ] as const
 
-export function WhyChoosePizzaHub() {
+export function WhyChoosePizzabari() {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -37,7 +37,7 @@ export function WhyChoosePizzaHub() {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
         <span className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
-          Why PizzaHub
+          Why Pizzabari
         </span>
         <h2 className="mt-3 font-heading text-headline text-balance">
           Crafted for every craving

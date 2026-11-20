@@ -136,7 +136,7 @@ export function VendorSubscription() {
             Subscription
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Manage your PizzaHub plan and unlock unlimited active menu items.
+            Manage your Pizzabari plan and unlock unlimited active menu items.
           </p>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { SignInForm } from "@/components/auth/sign-in-form"
 
 export const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to your PizzaHub account.",
+  description: "Sign in to your Pizzabari account.",
 }
 
 export default async function SignInPage({

@@ -31,7 +31,7 @@ const steps = [
   },
 ] as const
 
-export function HowPizzaHubWorks() {
+export function HowPizzabariWorks() {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -50,7 +50,7 @@ export function HowPizzaHubWorks() {
           Fresh Pizza in 3 Simple Steps
         </h2>
         <p className="mt-3 text-muted-foreground">
-          From craving to first bite, ordering with PizzaHub stays simple.
+          From craving to first bite, ordering with Pizzabari stays simple.
         </p>
       </motion.div>
 

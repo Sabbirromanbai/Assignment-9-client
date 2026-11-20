@@ -117,10 +117,10 @@ export function Footer() {
                   aria-hidden="true"
                 />
                 <a
-                  href="mailto:hello@pizzahub.example"
+                  href="mailto:hello@pizzabari.example"
                   className="transition-colors duration-200 ease-smooth hover:text-foreground"
                 >
-                  hello@pizzahub.example
+                  hello@pizzabari.example
                 </a>
               </li>
               <li className="flex gap-3">
@@ -135,7 +135,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-border/70 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} PizzaHub. All rights reserved.</p>
+          <p>© {year} Pizzabari. All rights reserved.</p>
           <p>Fired fresh, served warm.</p>
         </div>
       </div>

@@ -548,20 +548,24 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
                   type="submit"
                   disabled={isSubmittingOrder}
                   className={cn(
-                    "h-11 w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
-                    isSubmittingOrder && "cursor-not-allowed opacity-70"
+                    "inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-6 text-sm font-semibold tracking-wide text-primary-foreground shadow-glow transition-all duration-300 ease-smooth",
+                    "hover:-translate-y-0.5 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
+                    "active:translate-y-0 active:scale-[0.99]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    isSubmittingOrder &&
+                      "pointer-events-none cursor-not-allowed opacity-60 shadow-none hover:translate-y-0 hover:shadow-none active:scale-100"
                   )}
                 >
                   {isSubmittingOrder ? (
-                    <>
+                    <span className="inline-flex items-center justify-center gap-2">
                       <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                       Placing order...
-                    </>
+                    </span>
                   ) : (
-                    <>
+                    <span className="inline-flex items-center justify-center gap-2">
                       Place order
                       <ArrowRight className="size-4" aria-hidden="true" />
-                    </>
+                    </span>
                   )}
                 </button>
               </form>

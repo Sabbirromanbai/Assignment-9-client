@@ -107,7 +107,7 @@ export function SignUpForm() {
       toast({
         variant: "success",
         title: "Account created",
-        description: "Welcome to PizzaHub. Redirecting now.",
+        description: "Welcome to Pizzabari. Redirecting now.",
       })
       router.push("/")
       router.refresh()
@@ -192,7 +192,7 @@ export function SignUpForm() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="text-xs font-medium tracking-[0.2em] text-white/75 uppercase">
-            Join PizzaHub
+            Join Pizzabari
           </p>
           <h1
             id="sign-up-heading"

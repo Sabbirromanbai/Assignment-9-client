@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, X } from "lucide-react"
+import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, User, X } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -107,7 +107,7 @@ export function Navbar() {
       toast({
         variant: "success",
         title: "Signed out",
-        description: "You have been signed out of PizzaHub.",
+        description: "You have been signed out of Pizzabari.",
       })
       router.push("/")
       router.refresh()
@@ -270,16 +270,24 @@ export function Navbar() {
                         />
                         Dashboard
                       </Link>
-                      <button
-                        type="button"
-                        disabled
+                      <Link
+                        href="/dashboard/profile"
                         role="menuitem"
-                        className="flex w-full cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground opacity-60"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <User className="size-4" aria-hidden="true" />
+                        Profile Settings
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       >
                         <Settings className="size-4" aria-hidden="true" />
-                        Profile Settings
-                        <span className="ml-auto text-xs">Soon</span>
-                      </button>
+                        Settings
+                      </Link>
                     </div>
 
                     <div className="border-t border-border/70 pt-1">
@@ -409,6 +417,22 @@ export function Navbar() {
                   >
                     <LayoutDashboard className="size-4" aria-hidden="true" />
                     Dashboard
+                  </Link>
+                  <Link
+                    href="/dashboard/profile"
+                    onClick={() => setOpen(false)}
+                    className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+                  >
+                    <User className="size-4" aria-hidden="true" />
+                    Profile Settings
+                  </Link>
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setOpen(false)}
+                    className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+                  >
+                    <Settings className="size-4" aria-hidden="true" />
+                    Settings
                   </Link>
                   <button
                     type="button"

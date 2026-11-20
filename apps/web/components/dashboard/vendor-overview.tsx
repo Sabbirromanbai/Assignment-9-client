@@ -154,7 +154,7 @@ export function VendorOverview() {
           Your kitchen is quiet for now
         </h2>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          Add your first menu item to start receiving orders from PizzaHub
+          Add your first menu item to start receiving orders from Pizzabari
           customers.
         </p>
         <Link

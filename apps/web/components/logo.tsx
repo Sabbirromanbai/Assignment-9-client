@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Pizza } from "lucide-react"
+import Image from "next/image"
 
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -16,15 +16,22 @@ export function Logo({ className }: LogoProps) {
         className
       )}
     >
-      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft transition-transform duration-300 ease-smooth group-hover:-rotate-6">
-        <Pizza className="size-5" strokeWidth={2.2} aria-hidden="true" />
+      <span className="flex shrink-0 group-hover:-rotate-6 transition-transform duration-300 ease-smooth">
+        <Image
+          src="/images/pizza-logo.png"
+          alt="Pizzabari"
+          width={1774}
+          height={887}
+          sizes="(min-width: 640px) 120px, 100vw"
+          className="h-10 w-auto object-contain"
+        />
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-heading text-lg font-semibold tracking-tight">
-          PizzaHub
+          Pizzabari
         </span>
         <span className="mt-1 text-[0.625rem] font-medium tracking-[0.2em] text-muted-foreground uppercase">
-          Wood fired
+          Pizza mood, Deshi attitude!
         </span>
       </span>
     </Link>

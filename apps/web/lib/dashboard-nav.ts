@@ -47,6 +47,11 @@ export const DASHBOARD_NAV: Record<DashboardRole, DashboardNavItem[]> = {
       href: "/dashboard/profile",
       icon: Settings,
     },
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+    },
   ],
   customer: [
     { label: "Overview", href: "/dashboard/customer", icon: LayoutDashboard },
@@ -54,6 +59,11 @@ export const DASHBOARD_NAV: Record<DashboardRole, DashboardNavItem[]> = {
     {
       label: "Profile Settings",
       href: "/dashboard/profile",
+      icon: Settings,
+    },
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
       icon: Settings,
     },
   ],
@@ -69,6 +79,16 @@ export const DASHBOARD_NAV: Record<DashboardRole, DashboardNavItem[]> = {
       label: "Transactions",
       href: "/dashboard/admin/transactions",
       icon: CreditCard,
+    },
+    {
+      label: "Profile Settings",
+      href: "/dashboard/profile",
+      icon: Settings,
+    },
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
     },
   ],
 }

@@ -4,7 +4,7 @@ import { AdminOverview } from "@/components/dashboard/admin-overview"
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
-  description: "Overview of PizzaHub platform activity.",
+  description: "Overview of Pizzabari platform activity.",
 }
 
 export default function AdminDashboardPage() {

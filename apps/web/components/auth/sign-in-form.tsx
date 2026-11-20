@@ -83,7 +83,7 @@ export function SignInForm({
       toast({
         variant: "success",
         title: "Welcome back",
-        description: "Signing you in to PizzaHub.",
+        description: "Signing you in to Pizzabari.",
       })
       router.push(callbackURL)
       router.refresh()
@@ -220,7 +220,7 @@ export function SignInForm({
               Sign in
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Use your email and password to access PizzaHub.
+              Use your email and password to access Pizzabari.
             </p>
           </div>
 
@@ -372,7 +372,7 @@ export function SignInForm({
           </form>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            New to PizzaHub?{" "}
+            New to Pizzabari?{" "}
             <Link
               href="/sign-up"
               className="font-medium text-primary transition-colors hover:text-primary/80"

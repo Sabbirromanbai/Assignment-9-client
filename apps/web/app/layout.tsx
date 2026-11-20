@@ -21,11 +21,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "PizzaHub",
-    template: "%s | PizzaHub",
+    default: "Pizzabari",
+    template: "%s | Pizzabari",
   },
   description: "Handcrafted pizza, warm from the oven.",
-  applicationName: "PizzaHub",
+  applicationName: "Pizzabari",
 }
 
 export default function RootLayout({

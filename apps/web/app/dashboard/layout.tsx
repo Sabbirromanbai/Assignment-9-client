@@ -4,7 +4,7 @@ import { DashboardGuard } from "@/components/dashboard/dashboard-guard"
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "PizzaHub role-based dashboard.",
+  description: "Pizzabari role-based dashboard.",
 }
 
 export default function DashboardLayout({

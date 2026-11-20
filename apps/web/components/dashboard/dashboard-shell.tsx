@@ -94,7 +94,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
       toast({
         variant: "success",
         title: "Signed out",
-        description: "You have been signed out of PizzaHub.",
+        description: "You have been signed out of Pizzabari.",
       })
       window.location.href = "/"
     } catch {

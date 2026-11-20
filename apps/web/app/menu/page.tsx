@@ -4,7 +4,7 @@ import { BrowseMenu } from "@/components/browse-menu"
 
 export const metadata: Metadata = {
   title: "Browse Menu",
-  description: "Search and filter approved PizzaHub menu items.",
+  description: "Search and filter approved Pizzabari menu items.",
 }
 
 export default async function MenuPage({

@@ -175,7 +175,7 @@ export function AdminOverview() {
           Platform overview
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Monitor users, menu items, and transactions across PizzaHub.
+          Monitor users, menu items, and transactions across Pizzabari.
         </p>
       </div>
 

@@ -5,16 +5,17 @@ import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 
 function ThemeProvider({
   children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme="light"
-      storageKey="pizzahub-theme"
-      enableSystem
+      themes={["light", "dark"]}
+      storageKey="pizzabari-theme"
+      enableSystem={false}
       disableTransitionOnChange
-      {...props}
     >
       <ThemeHotkey />
       {children}

@@ -737,4 +737,12 @@
     animation: none !important;
     transition: none !important;
   }
+
+  .pizza-card:hover .pizza-card-image {
+    transform: none;
+  }
+
+  .pizza-card:hover .pizza-card-glow {
+    transform: translateZ(-20px) scale(1);
+  }
 }

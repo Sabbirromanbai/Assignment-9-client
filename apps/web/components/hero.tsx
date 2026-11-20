@@ -29,7 +29,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { useToast } from "@/components/toast-provider"
 import { authClient } from "@/lib/auth-client"
-import { resolveVendorCtaHref } from "@/lib/auth"
+import { resolveVendorCtaHref, GUEST_VENDOR_CTA_HREF } from "@/lib/auth"
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -240,8 +240,16 @@ export function Hero() {
       // click time, so a stale client cache can never send a vendor to sign-in.
       const { data: session, error } = await authClient.getSession()
 
-      if (error || !session) {
-        throw error ?? new Error("Unable to verify the current session")
+      // A genuine network/server failure should surface an error, but a
+      // null session with no error is the normal logged-out state: send the
+      // guest to the login page instead of showing a spurious error toast.
+      if (error) {
+        throw error
+      }
+
+      if (!session) {
+        router.push(GUEST_VENDOR_CTA_HREF)
+        return
       }
 
       router.push(resolveVendorCtaHref(session))

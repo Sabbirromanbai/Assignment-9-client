@@ -37,7 +37,7 @@ type SessionLike = {
 // route exists in this app, so the Hero CTA reuses it.
 const VENDOR_APPLICATION_HREF: string = "/sign-up"
 
-const GUEST_VENDOR_CTA_HREF = `/sign-in?callbackURL=${encodeURIComponent(
+export const GUEST_VENDOR_CTA_HREF = `/sign-in?callbackURL=${encodeURIComponent(
   "/dashboard"
 )}`
 

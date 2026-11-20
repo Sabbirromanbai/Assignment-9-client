@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumSkeleton } from "@/components/premium-ui"
 import {
   fetchAdminTransactions,
   type Transaction,
@@ -125,7 +126,7 @@ export function AdminTransactions() {
         <select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
-          className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
+          className="premium-input h-10"
           aria-label="Filter by status"
         >
           <option value="">All statuses</option>
@@ -138,7 +139,7 @@ export function AdminTransactions() {
         <select
           value={planFilter}
           onChange={(event) => setPlanFilter(event.target.value)}
-          className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
+          className="premium-input h-10"
           aria-label="Filter by plan"
         >
           <option value="">All plans</option>
@@ -157,7 +158,7 @@ export function AdminTransactions() {
             value={vendorInput}
             onChange={(event) => setVendorInput(event.target.value)}
             placeholder="Filter by vendor ID"
-            className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+            className="premium-input h-10 pl-9"
           />
         </label>
       </div>
@@ -166,10 +167,7 @@ export function AdminTransactions() {
         {status === "loading" ? (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-20 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-              />
+              <PremiumSkeleton key={index} className="h-20 rounded-2xl" />
             ))}
           </div>
         ) : null}

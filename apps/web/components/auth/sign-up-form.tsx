@@ -223,7 +223,7 @@ export function SignUpForm() {
         </motion.div>
 
         <motion.div
-          className="rounded-3xl border border-white/20 bg-background/78 p-6 shadow-elevated backdrop-blur-2xl sm:p-8"
+          className="premium-card relative rounded-3xl p-6 shadow-elevated sm:p-8"
           initial={reduceMotion ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
@@ -258,7 +258,7 @@ export function SignUpForm() {
                 onChange={(event) => updateField("name", event.target.value)}
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? "sign-up-name-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                className="premium-input h-11"
                 placeholder="Your name"
               />
               {errors.name ? (
@@ -285,7 +285,7 @@ export function SignUpForm() {
                 onChange={(event) => updateField("email", event.target.value)}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? "sign-up-email-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                className="premium-input h-11"
                 placeholder="you@example.com"
               />
               {errors.email ? (
@@ -318,7 +318,7 @@ export function SignUpForm() {
                   aria-describedby={
                     errors.password ? "sign-up-password-error" : undefined
                   }
-                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 pr-11 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                  className="premium-input h-11 pr-11"
                   placeholder="At least 6 characters"
                 />
                 <button
@@ -364,7 +364,7 @@ export function SignUpForm() {
                 }
                 aria-invalid={Boolean(errors.role)}
                 aria-describedby={errors.role ? "sign-up-role-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                className="premium-input h-11"
               >
                 <option value="customer">Customer</option>
                 <option value="vendor">Vendor</option>

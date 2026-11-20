@@ -4,12 +4,18 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronRight, LogOut, Menu, ShieldCheck, X } from "lucide-react"
-import { motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { Logo } from "@/components/logo"
+import {
+  PremiumCrown,
+  PremiumVendorBadge,
+  PremiumVendorChip,
+} from "@/components/premium-vendor-mark"
+import { usePremiumVendor } from "@/components/premium-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useToast } from "@/components/toast-provider"
 import { authClient } from "@/lib/auth-client"
@@ -42,6 +48,7 @@ function getPageTitle(pathname: string, role: DashboardRole) {
 export function DashboardShell({ role, user, children }: DashboardShellProps) {
   const pathname = usePathname()
   const reduceMotion = useReducedMotion()
+  const { isPremiumVendor } = usePremiumVendor()
   const { toast } = useToast()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [isSigningOut, setIsSigningOut] = React.useState(false)
@@ -126,25 +133,36 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
       </div>
 
       <div className="px-4 py-5">
-        <div className="flex items-center gap-3 rounded-2xl border border-border/70 bg-card/70 p-3 shadow-soft backdrop-blur-sm">
-          {user.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={user.image}
-              alt=""
-              className="size-10 rounded-full object-cover"
-            />
-          ) : (
-            <span className="grid size-10 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              {initials}
-            </span>
-          )}
+        <div className="premium-card premium-card-interactive account-surface account-surface-interactive flex items-center gap-3 rounded-2xl p-3">
+          <span className="relative shrink-0">
+            {user.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.image}
+                alt=""
+                className="size-10 rounded-full object-cover ring-1 ring-border/70"
+              />
+            ) : (
+              <span className="grid size-10 place-items-center rounded-full bg-gradient-to-br from-brand-orange to-brand-tomato text-sm font-semibold text-white">
+                {initials}
+              </span>
+            )}
+            {role === "vendor" && isPremiumVendor ? (
+              <PremiumCrown className="absolute -top-2 -left-2" />
+            ) : null}
+          </span>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{displayName}</p>
-            <p className="flex items-center gap-1 text-xs text-muted-foreground capitalize">
-              <ShieldCheck className="size-3 text-primary" aria-hidden="true" />
+            <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground capitalize">
+              <ShieldCheck
+                className="size-3 text-[var(--role-badge-foreground)]"
+                aria-hidden="true"
+              />
               {role}
             </p>
+            {role === "vendor" && isPremiumVendor ? (
+              <PremiumVendorBadge compact className="mt-1.5" />
+            ) : null}
           </div>
         </div>
       </div>
@@ -160,9 +178,9 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-smooth",
+                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-all duration-300 ease-premium focus-visible:ring-2 focus-visible:ring-ring/60",
                 active
-                  ? "bg-primary text-primary-foreground shadow-soft"
+                  ? "bg-[linear-gradient(110deg,var(--brand-tomato),var(--brand-orange))] text-white shadow-glow"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
               )}
             >
@@ -200,7 +218,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
 
   return (
     <div className="min-h-svh bg-background">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-border/70 bg-card/70 backdrop-blur-xl lg:block">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-border/70 bg-sidebar/85 shadow-card backdrop-blur-2xl lg:block">
         {sidebarContent}
       </aside>
 
@@ -217,7 +235,7 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
             initial={reduceMotion ? false : { x: -280, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 left-0 z-50 w-72 border-r border-border/70 bg-background/95 shadow-elevated backdrop-blur-xl"
+            className="fixed inset-y-0 left-0 z-50 w-72 border-r border-border/70 bg-sidebar/95 shadow-elevated backdrop-blur-2xl"
           >
             <button
               type="button"
@@ -233,11 +251,15 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
       ) : null}
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/70 bg-background/85 px-4 backdrop-blur-xl sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/70 bg-background/85 px-4 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70 sm:px-6">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-orange/40 to-transparent"
+          />
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-border/70 bg-card/60 text-foreground shadow-soft transition-colors hover:bg-accent hover:text-accent-foreground lg:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-xl border border-border/70 bg-card/70 text-foreground shadow-soft transition-all duration-300 ease-premium hover:border-brand-orange/30 hover:bg-accent/70 hover:text-accent-foreground lg:hidden"
             aria-label="Open dashboard menu"
           >
             <Menu className="size-4" aria-hidden="true" />
@@ -246,16 +268,33 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
             <p className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
               Dashboard
             </p>
-            <h1 className="truncate font-heading text-lg font-semibold tracking-tight">
-              {getPageTitle(pathname, role)}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="truncate font-heading text-lg font-semibold tracking-tight">
+                {getPageTitle(pathname, role)}
+              </h1>
+              {role === "vendor" && isPremiumVendor ? (
+                <PremiumVendorChip compact className="hidden sm:inline-flex" />
+              ) : null}
+            </div>
           </div>
           <ThemeToggle />
         </header>
 
-        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          {children}
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={pathname}
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.35,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
   )

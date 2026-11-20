@@ -176,7 +176,7 @@ export function VendorMenuItemForm() {
       </div>
 
       <motion.div
-        className="mt-8 rounded-3xl border border-border/70 bg-card/80 p-6 shadow-elevated backdrop-blur-2xl sm:p-8 lg:p-10"
+        className="mt-8 premium-card rounded-3xl p-6 shadow-elevated sm:p-8 lg:p-10"
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -199,7 +199,7 @@ export function VendorMenuItemForm() {
               onChange={(event) => updateField("itemName", event.target.value)}
               aria-invalid={Boolean(errors.itemName)}
               aria-describedby={errors.itemName ? "menu-item-name-error" : undefined}
-              className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+              className="premium-input h-11"
               placeholder="e.g. Margherita Classic"
             />
             {errors.itemName ? (
@@ -226,7 +226,7 @@ export function VendorMenuItemForm() {
               }
               aria-invalid={Boolean(errors.category)}
               aria-describedby={errors.category ? "menu-item-category-error" : undefined}
-              className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+              className="premium-input h-11"
             >
               {PIZZA_CATEGORIES.map((category) => (
                 <option key={category} value={category}>
@@ -257,7 +257,7 @@ export function VendorMenuItemForm() {
               onChange={(event) => updateField("description", event.target.value)}
               aria-invalid={Boolean(errors.description)}
               aria-describedby={errors.description ? "menu-item-description-error" : undefined}
-              className="h-32 w-full rounded-lg border border-border/70 bg-background/70 px-3 py-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+              className="premium-input h-32 resize-y py-3"
               placeholder="Describe your menu item..."
             />
             {errors.description ? (
@@ -289,7 +289,7 @@ export function VendorMenuItemForm() {
                   onChange={(event) => updateField("price", event.target.value)}
                   aria-invalid={Boolean(errors.price)}
                   aria-describedby={errors.price ? "menu-item-price-error" : undefined}
-                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 pl-10 pr-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                  className="premium-input h-11 pl-10"
                   placeholder="0.00"
                 />
                 {errors.price ? (
@@ -317,7 +317,7 @@ export function VendorMenuItemForm() {
                 onChange={(event) => updateField("location", event.target.value)}
                 aria-invalid={Boolean(errors.location)}
                 aria-describedby={errors.location ? "menu-item-location-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                className="premium-input h-11"
                 placeholder="e.g. New York, NY"
               />
               {errors.location ? (

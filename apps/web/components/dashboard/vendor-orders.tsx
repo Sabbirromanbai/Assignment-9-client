@@ -8,6 +8,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumSkeleton } from "@/components/premium-ui"
 import {
   fetchMyOrders,
   fetchVendorMenuItems,
@@ -87,10 +88,7 @@ function OrdersSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="h-40 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-        />
+        <PremiumSkeleton key={index} className="h-40 rounded-2xl" />
       ))}
     </div>
   )
@@ -254,7 +252,7 @@ export function VendorOrders() {
               return (
                 <motion.article
                   key={order._id}
-                  className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-card backdrop-blur-sm transition-shadow hover:shadow-elevated"
+                  className="group relative overflow-hidden premium-card transition-shadow hover:shadow-elevated"
                   initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{

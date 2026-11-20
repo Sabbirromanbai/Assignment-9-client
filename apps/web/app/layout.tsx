@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
+import { PremiumProvider } from "@/components/premium-provider"
 import { SiteChrome } from "@/components/site-chrome"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ToastProvider } from "@/components/toast-provider"
@@ -43,7 +44,9 @@ export default function RootLayout({
       <body className="flex min-h-svh flex-col">
         <ThemeProvider>
           <ToastProvider>
-            <SiteChrome>{children}</SiteChrome>
+            <PremiumProvider>
+              <SiteChrome>{children}</SiteChrome>
+            </PremiumProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

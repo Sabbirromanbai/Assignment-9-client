@@ -8,6 +8,11 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import {
+  AnimatedCounter,
+  PremiumSkeleton,
+  TiltCard,
+} from "@/components/premium-ui"
 import { fetchCustomerDashboard, type CustomerDashboardData } from "@/lib/api"
 import { useToast } from "@/components/toast-provider"
 
@@ -29,8 +34,8 @@ function StatCard({
   reduceMotion: boolean | null
 }) {
   return (
-    <motion.div
-      className="relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-5 shadow-card backdrop-blur-sm"
+    <TiltCard
+      className="relative overflow-hidden p-5"
       initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -43,15 +48,15 @@ function StatCard({
         <div>
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="mt-3 font-heading text-3xl font-bold tracking-tight tabular-nums">
-            {value}
+            <AnimatedCounter value={value} />
           </p>
           <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
         </div>
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-tomato/12 to-brand-orange/16 text-brand-orange">
           <Icon className="size-5" aria-hidden="true" />
         </span>
       </div>
-    </motion.div>
+    </TiltCard>
   )
 }
 
@@ -60,10 +65,7 @@ function OverviewSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-36 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-          />
+          <PremiumSkeleton key={index} className="h-36 rounded-2xl" />
         ))}
       </div>
     </div>

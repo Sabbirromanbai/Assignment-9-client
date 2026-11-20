@@ -20,6 +20,9 @@ import {
   type VendorProfile,
 } from "@/lib/api"
 import { OrderStatusTimeline } from "@/components/dashboard/order-status-timeline"
+import { PremiumSkeleton } from "@/components/premium-ui"
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 import { useToast } from "@/components/toast-provider"
 
 type ViewStatus = "loading" | "success" | "empty" | "error"
@@ -87,10 +90,7 @@ function OrdersSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="h-40 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-        />
+        <PremiumSkeleton key={index} className="h-40 rounded-2xl" />
       ))}
     </div>
   )
@@ -275,7 +275,7 @@ export function CustomerOrders() {
               return (
                 <motion.article
                   key={order._id}
-                  className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-card backdrop-blur-sm transition-shadow hover:shadow-elevated"
+                  className="group relative overflow-hidden premium-card transition-shadow hover:shadow-elevated"
                   initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -322,11 +322,14 @@ export function CustomerOrders() {
                       ) : null}
 
                       <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Store className="size-4 shrink-0 text-primary" aria-hidden="true" />
                           <span className="truncate">
                             {vendor?.businessName || vendor?.name || "Vendor"}
                           </span>
+                          {vendor && isActivePremiumSubscription(vendor) ? (
+                            <PremiumVendorChip compact />
+                          ) : null}
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="size-4 shrink-0 text-primary" aria-hidden="true" />

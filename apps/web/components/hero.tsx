@@ -3,7 +3,16 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Flame, Sparkles, Star, Store, Timer } from "lucide-react"
+import { useRouter } from "next/navigation"
+import {
+  ArrowRight,
+  Flame,
+  Loader2,
+  Sparkles,
+  Star,
+  Store,
+  Timer,
+} from "lucide-react"
 import {
   motion,
   useMotionTemplate,
@@ -17,6 +26,10 @@ import {
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { useToast } from "@/components/toast-provider"
+import { authClient } from "@/lib/auth-client"
+import { resolveVendorCtaHref } from "@/lib/auth"
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -180,6 +193,10 @@ function GlassChip({
 
 export function Hero() {
   const reduceMotion = useReducedMotion()
+  const router = useRouter()
+  const { toast } = useToast()
+  const [vendorRedirectPending, setVendorRedirectPending] =
+    React.useState(false)
   const sectionRef = React.useRef<HTMLElement | null>(null)
   const pointerX = useMotionValue(0)
   const pointerY = useMotionValue(0)
@@ -209,6 +226,34 @@ export function Hero() {
   function handlePointerLeave() {
     pointerX.set(0)
     pointerY.set(0)
+  }
+
+  async function handleVendorRedirect() {
+    if (vendorRedirectPending) {
+      return
+    }
+
+    setVendorRedirectPending(true)
+
+    try {
+      // Fetch the live Better Auth session (cookie + database user role) at
+      // click time, so a stale client cache can never send a vendor to sign-in.
+      const { data: session, error } = await authClient.getSession()
+
+      if (error || !session) {
+        throw error ?? new Error("Unable to verify the current session")
+      }
+
+      router.push(resolveVendorCtaHref(session))
+    } catch {
+      toast({
+        variant: "error",
+        title: "Couldn't verify your session",
+        description: "Please try again in a moment.",
+      })
+    } finally {
+      setVendorRedirectPending(false)
+    }
   }
 
   return (
@@ -366,8 +411,11 @@ export function Hero() {
               whileTap={reduceMotion ? undefined : { scale: 0.96, y: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
-              <Link
-                href="/sign-up"
+              <button
+                type="button"
+                onClick={handleVendorRedirect}
+                disabled={vendorRedirectPending}
+                aria-busy={vendorRedirectPending}
                 className={cn(
                   buttonVariants(),
                   "group/button relative h-auto w-full rounded-xl border border-[var(--hero-border)] bg-[var(--hero-surface)] px-9 py-5 text-base font-bold tracking-wide text-[var(--hero-ink)] shadow-[var(--hero-shadow)] backdrop-blur-xl transition-colors duration-300 hover:bg-[var(--hero-surface-hover)] sm:w-auto",
@@ -378,10 +426,22 @@ export function Hero() {
                   className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-transparent transition-all duration-500 group-hover/button:ring-brand-tomato/60"
                 />
                 <span className="relative z-10 flex items-center gap-2">
-                  <Store className="size-5 transition-transform duration-500 ease-smooth group-hover/button:-rotate-12 group-hover/button:scale-110" aria-hidden="true" />
-                  Become a Vendor
+                  {vendorRedirectPending ? (
+                    <Loader2
+                      className="size-5 animate-spin"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Store
+                      className="size-5 transition-transform duration-500 ease-smooth group-hover/button:-rotate-12 group-hover/button:scale-110"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {vendorRedirectPending
+                    ? "Checking your account…"
+                    : "Become a Vendor"}
                 </span>
-              </Link>
+              </button>
             </motion.div>
           </motion.div>
 

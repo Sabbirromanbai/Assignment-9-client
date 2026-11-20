@@ -9,6 +9,8 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumSkeleton } from "@/components/premium-ui"
+
 import { fetchMenuItems, type MenuItem } from "@/lib/api"
 
 type Category = {
@@ -52,10 +54,7 @@ function CategorySkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 6 }).map((_, index) => (
-        <div
-          key={index}
-          className="aspect-[4/3] animate-pulse rounded-2xl bg-muted"
-        />
+        <PremiumSkeleton key={index} className="aspect-[4/3] rounded-2xl" />
       ))}
     </div>
   )
@@ -74,7 +73,7 @@ function CategoryCard({ category }: { category: Category }) {
     >
       <Link
         href={`/menu?category=${encodeURIComponent(category.name)}`}
-        className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+        className="group relative block overflow-hidden premium-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
       >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {category.image && !imageFailed ? (

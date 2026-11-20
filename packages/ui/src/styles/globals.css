@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:where(.theme-tomato, .theme-tomato *));
+@custom-variant dark (&:where(.dark, .dark *));
 @source "../../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
@@ -49,6 +49,11 @@
   --color-brand-basil: var(--brand-basil);
   --color-brand-cream: var(--brand-cream);
   --color-brand-ink: var(--brand-ink);
+  --color-premium-gold: var(--premium-gold);
+  --color-premium-gold-soft: var(--premium-gold-soft);
+  --color-premium-gold-deep: var(--premium-gold-deep);
+  --color-premium-gold-ink: var(--premium-gold-ink);
+  --color-surface: var(--surface);
 
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
@@ -76,6 +81,7 @@
   --text-headline--font-weight: 700;
 
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-duration: 220ms;
   --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -93,6 +99,47 @@
   --brand-basil: #31865A;
   --brand-cream: #FFF8ED;
   --brand-ink: #25211E;
+
+  /* Premium gold — darker text value keeps contrast on light surfaces. */
+  --premium-gold: #C68A1B;
+  --premium-gold-soft: #FFE9A8;
+  --premium-gold-deep: #9A660C;
+  --premium-gold-ink: #3B2705;
+  --premium-gold-gradient: linear-gradient(
+    110deg,
+    var(--premium-gold-soft) 0%,
+    var(--premium-gold) 48%,
+    var(--premium-gold-deep) 100%
+  );
+  --premium-glow: rgb(198 138 27 / 0.42);
+  --premium-gold-border: color-mix(in oklab, var(--premium-gold) 45%, transparent);
+  --premium-gold-wash: color-mix(in oklab, var(--premium-gold) 12%, transparent);
+  --premium-tooltip: #241B0D;
+  --surface: var(--card);
+
+  /* Account, menu and profile surfaces stay readable in both themes. */
+  --account-surface: color-mix(in oklab, var(--card) 92%, var(--background));
+  --account-surface-hover: color-mix(in oklab, var(--accent) 55%, var(--card));
+  --account-border: color-mix(in oklab, var(--foreground) 14%, var(--border));
+  --account-border-strong: color-mix(in oklab, var(--brand-orange) 45%, var(--border));
+  --menu-surface: color-mix(in oklab, var(--popover) 96%, var(--background));
+  --menu-hover: color-mix(in oklab, var(--accent) 65%, var(--popover));
+  --role-badge-surface: color-mix(in oklab, var(--brand-orange) 16%, var(--card));
+  --role-badge-foreground: var(--foreground);
+  --read-only-surface: color-mix(in oklab, var(--muted) 70%, var(--card));
+
+  /* Pizza image presentation. */
+  --pizza-stage: radial-gradient(
+    circle at 50% 30%,
+    color-mix(in oklab, var(--brand-cheese) 22%, transparent),
+    transparent 62%
+  );
+  --pizza-overlay: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--brand-ink) 58%, transparent) 0%,
+    transparent 58%
+  );
+  --pizza-glow: color-mix(in oklab, var(--brand-orange) 38%, transparent);
 
   /* Semantic */
   --background: var(--brand-cream);
@@ -163,6 +210,48 @@
   --brand-cream: #FFF8ED;
   --brand-ink: #25211E;
 
+  /* Brighter gold stays recognizable and readable on dark surfaces. */
+  --premium-gold: #F2C75C;
+  --premium-gold-soft: #FFF0BE;
+  --premium-gold-deep: #C18A24;
+  --premium-gold-ink: #2A1C06;
+  --premium-gold-gradient: linear-gradient(
+    110deg,
+    var(--premium-gold-soft) 0%,
+    var(--premium-gold) 48%,
+    var(--premium-gold-deep) 100%
+  );
+  --premium-glow: rgb(242 199 92 / 0.45);
+  --premium-gold-border: color-mix(in oklab, var(--premium-gold) 65%, transparent);
+  --premium-gold-wash: color-mix(in oklab, var(--premium-gold) 18%, transparent);
+  --premium-tooltip: #17110A;
+  --surface: var(--card);
+
+  /* Stronger separation is needed for account/profile surfaces on dark. */
+  --account-surface: color-mix(in oklab, var(--card) 94%, var(--background));
+  --account-surface-hover: color-mix(in oklab, var(--accent) 72%, var(--card));
+  --account-border: oklch(1 0 0 / 16%);
+  --account-border-strong: color-mix(in oklab, var(--brand-orange) 55%, var(--border));
+  --menu-surface: var(--popover);
+  --menu-hover: color-mix(in oklab, var(--accent) 78%, var(--popover));
+  --role-badge-surface: color-mix(in oklab, var(--premium-gold) 14%, var(--card));
+  --role-badge-foreground: var(--premium-gold-soft);
+  --read-only-surface: color-mix(in oklab, var(--muted) 65%, var(--card));
+
+  /* Darker overlay keeps light product photography readable on dark surfaces. */
+  --pizza-stage: radial-gradient(
+    circle at 50% 28%,
+    color-mix(in oklab, var(--brand-orange) 16%, transparent),
+    transparent 64%
+  );
+  --pizza-overlay: linear-gradient(
+    to top,
+    oklch(0 0 0 / 72%) 0%,
+    color-mix(in oklab, var(--brand-ink) 38%, transparent) 42%,
+    transparent 72%
+  );
+  --pizza-glow: color-mix(in oklab, var(--brand-orange) 52%, transparent);
+
   /* Semantic */
   --background: #1C1917;
   --foreground: var(--brand-cream);
@@ -219,6 +308,37 @@
     0 18px 50px -20px oklch(0.6354 0.2094 28.54 / 0.5);
 }
 
+@keyframes pizzabari-logo-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg) rotateY(-4deg);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0) rotate(1deg) rotateY(4deg);
+  }
+}
+
+@keyframes premium-crown-shine {
+  0%, 18% {
+    transform: translateX(-160%) skewX(-18deg);
+    opacity: 0;
+  }
+  32% {
+    opacity: 0.9;
+  }
+  58%, 100% {
+    transform: translateX(180%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pizzabari-logo-mark,
+  .premium-crown-shine,
+  .premium-crown-shine > * {
+    animation: none !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -260,5 +380,361 @@
     html {
       scroll-behavior: auto;
     }
+  }
+}
+
+@keyframes premium-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes premium-float-soft {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+@keyframes premium-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pizza-card-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes pizza-badge-shine {
+  0%,
+  20% {
+    transform: translateX(-160%) skewX(-18deg);
+    opacity: 0;
+  }
+  38% {
+    opacity: 0.85;
+  }
+  62%,
+  100% {
+    transform: translateX(180%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@layer components {
+  .premium-card {
+    @apply relative rounded-2xl border border-border/70 bg-card/80 shadow-card backdrop-blur-sm;
+  }
+
+  .premium-card::before {
+    content: "";
+    position: absolute;
+    inset-inline: 1.25rem;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--brand-orange) 65%, transparent),
+      transparent
+    );
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .premium-card-interactive {
+    transition:
+      transform 400ms var(--ease-premium),
+      box-shadow 400ms var(--ease-premium),
+      border-color 400ms var(--ease-premium);
+    transform-style: preserve-3d;
+  }
+
+  .premium-card-interactive:hover {
+    transform: translate3d(0, -4px, 0);
+    border-color: color-mix(in oklab, var(--brand-orange) 35%, var(--border));
+    box-shadow: var(--elevation-elevated);
+  }
+
+  .pizza-card {
+    isolation: isolate;
+    border-radius: 1.5rem;
+    background-color: var(--card);
+    background-image:
+      radial-gradient(
+        120% 80% at 50% -15%,
+        color-mix(in oklab, var(--brand-orange) 14%, transparent),
+        transparent 62%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in oklab, var(--card) 96%, var(--brand-cream)),
+        var(--card)
+      );
+    will-change: transform;
+  }
+
+  .pizza-card:hover {
+    border-color: color-mix(in oklab, var(--brand-orange) 45%, var(--border));
+    box-shadow: var(--elevation-elevated);
+  }
+
+  .pizza-card-image-stage {
+    background-image: var(--pizza-stage);
+  }
+
+  .pizza-card-overlay {
+    background-image: var(--pizza-overlay);
+  }
+
+  .pizza-card-glow {
+    background: radial-gradient(ellipse, var(--pizza-glow), transparent 70%);
+    filter: blur(18px);
+    opacity: 0.7;
+    transform: translateZ(-20px);
+    transition:
+      opacity 450ms var(--ease-premium),
+      transform 450ms var(--ease-premium);
+  }
+
+  .pizza-card-float {
+    animation: pizza-card-float 7s ease-in-out infinite;
+  }
+
+  .pizza-card-image {
+    object-position: center;
+    filter: drop-shadow(0 16px 18px oklch(0.2 0.03 35 / 0.2));
+    transition:
+      transform 650ms var(--ease-premium),
+      filter 650ms var(--ease-premium);
+  }
+
+  .pizza-card-badge,
+  .pizza-card-rating {
+    @apply border border-white/15 text-white shadow-soft backdrop-blur-xl;
+    background-color: color-mix(in oklab, var(--brand-ink) 58%, transparent);
+  }
+
+  .pizza-card-badge {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pizza-card-badge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--brand-cheese) 65%, transparent),
+      transparent
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .pizza-card-category {
+    @apply bg-brand-orange/12 text-brand-orange;
+    background-color: color-mix(in oklab, var(--brand-orange) 14%, transparent);
+  }
+
+  .pizza-card-add {
+    background-image: linear-gradient(
+      110deg,
+      var(--brand-tomato) 0%,
+      var(--brand-orange) 100%
+    );
+    box-shadow: 0 12px 26px -14px
+      color-mix(in oklab, var(--brand-tomato) 75%, transparent);
+    transition:
+      transform 260ms var(--ease-premium),
+      box-shadow 260ms var(--ease-premium),
+      filter 260ms var(--ease-premium);
+  }
+
+  .pizza-card-add:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 18px 34px -14px
+      color-mix(in oklab, var(--brand-tomato) 85%, transparent);
+  }
+
+  .pizza-card-add:active {
+    transform: scale(0.98);
+  }
+
+  .pizza-card-details {
+    transition:
+      background-color 260ms var(--ease-premium),
+      border-color 260ms var(--ease-premium),
+      color 260ms var(--ease-premium);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pizza-card:hover .pizza-card-image {
+      transform: scale(1.08);
+      filter: drop-shadow(0 22px 24px oklch(0.2 0.03 35 / 0.3));
+    }
+
+    .pizza-card:hover .pizza-card-glow {
+      opacity: 0.95;
+      transform: translateZ(-20px) scale(1.1);
+    }
+
+    .pizza-card:hover .pizza-card-badge::after {
+      animation: pizza-badge-shine 900ms var(--ease-premium) 1;
+    }
+  }
+
+  /* Gradients must be assigned to background-image, not background-color. */
+  .premium-gold-surface {
+    background-image: var(--premium-gold-gradient);
+  }
+
+  .account-surface {
+    @apply border text-foreground shadow-soft backdrop-blur-xl;
+    background-color: var(--account-surface);
+    border-color: var(--account-border);
+  }
+
+  .account-surface-interactive {
+    transition:
+      background-color 300ms var(--ease-premium),
+      border-color 300ms var(--ease-premium),
+      box-shadow 300ms var(--ease-premium);
+  }
+
+  .account-surface-interactive:hover,
+  .account-surface-interactive[aria-expanded="true"] {
+    background-color: var(--account-surface-hover);
+    border-color: var(--account-border-strong);
+  }
+
+  .account-menu {
+    @apply overflow-hidden rounded-2xl shadow-elevated backdrop-blur-2xl;
+    background-color: var(--menu-surface);
+    border: 1px solid var(--account-border);
+  }
+
+  .account-menu-item {
+    @apply flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-foreground outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring/50;
+  }
+
+  .account-menu-item:hover,
+  .account-menu-item:focus-visible {
+    background-color: var(--menu-hover);
+    color: var(--foreground);
+  }
+
+  .role-badge {
+    @apply inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-wide;
+    background-color: var(--role-badge-surface);
+    color: var(--role-badge-foreground);
+  }
+
+  .read-only-field {
+    @apply h-11 w-full cursor-not-allowed rounded-lg border px-3 text-sm text-muted-foreground;
+    background-color: var(--read-only-surface);
+    border-color: var(--account-border);
+  }
+
+  .premium-input {
+    @apply w-full rounded-xl border border-input bg-background/70 px-3 py-2.5 text-sm text-foreground shadow-soft outline-none transition-all duration-200 placeholder:text-muted-foreground/70;
+  }
+
+  .premium-input:focus {
+    border-color: color-mix(in oklab, var(--brand-orange) 65%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-cheese) 28%, transparent);
+  }
+
+  .premium-label {
+    @apply text-xs font-semibold tracking-wide text-foreground/85;
+  }
+
+  .premium-empty {
+    @apply flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-card/50 px-6 py-14 text-center;
+  }
+
+  .premium-skeleton {
+    @apply relative overflow-hidden rounded-xl bg-muted/70;
+  }
+
+  .premium-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--foreground) 8%, transparent),
+      transparent
+    );
+    animation: premium-shimmer 1.8s infinite;
+  }
+
+  .premium-table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .premium-table thead th {
+    @apply border-b border-border/70 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase;
+  }
+
+  .premium-table tbody td {
+    @apply border-b border-border/60 px-4 py-3 align-middle;
+  }
+
+  .premium-gradient-text {
+    background: linear-gradient(
+      100deg,
+      var(--brand-tomato),
+      var(--brand-orange) 55%,
+      var(--premium-gold)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .premium-float-soft {
+    animation: premium-float-soft 7s ease-in-out infinite;
+  }
+
+  .premium-reveal {
+    animation: premium-reveal 600ms var(--ease-premium) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-card-interactive,
+  .account-surface-interactive,
+  .premium-input,
+  .premium-float-soft,
+  .premium-reveal,
+  .pizza-card-float,
+  .pizza-card-image,
+  .pizza-card-glow,
+  .pizza-card-add,
+  .pizza-card-details,
+  .pizza-card-badge::after,
+  .premium-skeleton::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

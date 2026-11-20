@@ -72,7 +72,7 @@ export function HowPizzabariWorks() {
             return (
               <motion.article
                 key={step.title}
-                className="group relative rounded-2xl border border-border/70 bg-card p-6 text-center shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+                className="group relative premium-card p-6 text-center transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
                 initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}

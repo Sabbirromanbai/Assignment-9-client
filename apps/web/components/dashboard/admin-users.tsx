@@ -7,11 +7,14 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumSkeleton } from "@/components/premium-ui"
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
 import {
   fetchAdminUsers,
   setUserBlocked,
   type AdminUser,
 } from "@/lib/api"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 import { useToast } from "@/components/toast-provider"
 
 type ViewStatus = "loading" | "success" | "empty" | "error"
@@ -125,14 +128,14 @@ export function AdminUsers() {
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder="Search by name or email"
-            className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+            className="premium-input h-10 pl-9"
           />
         </label>
 
         <select
           value={roleFilter}
           onChange={(event) => setRoleFilter(event.target.value)}
-          className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60"
+          className="premium-input h-10"
           aria-label="Filter by role"
         >
           <option value="">All roles</option>
@@ -145,10 +148,7 @@ export function AdminUsers() {
         {status === "loading" ? (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-20 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-              />
+              <PremiumSkeleton key={index} className="h-20 rounded-2xl" />
             ))}
           </div>
         ) : null}
@@ -212,6 +212,10 @@ export function AdminUsers() {
                       <span className="inline-flex rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground capitalize">
                         {user.role}
                       </span>
+                      {user.role === "vendor" &&
+                      isActivePremiumSubscription(user) ? (
+                        <PremiumVendorChip compact />
+                      ) : null}
                       {user.isBlocked ? (
                         <span className="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-950/40 dark:text-red-400">
                           Blocked

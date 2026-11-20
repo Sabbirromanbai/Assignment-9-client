@@ -4,6 +4,8 @@ import * as React from "react"
 import { Loader2 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
+import { usePremiumVendor } from "@/components/premium-provider"
 import { ProfileImageUpload } from "@/components/profile-image-upload"
 import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -42,6 +44,7 @@ export function ProfileManagement() {
   const { isPending, isAuthenticated, user, role } = useAuthSession()
   const reduceMotion = useReducedMotion()
   const { toast } = useToast()
+  const { isPremiumVendor } = usePremiumVendor()
 
   const isVendor = role === "vendor"
 
@@ -187,12 +190,15 @@ export function ProfileManagement() {
         <p className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
           Account
         </p>
-        <h1
-          id="profile-heading"
-          className="mt-3 font-heading text-3xl font-bold tracking-tight"
-        >
-          Profile settings
-        </h1>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h1
+            id="profile-heading"
+            className="font-heading text-3xl font-bold tracking-tight"
+          >
+            Profile settings
+          </h1>
+          {isVendor && isPremiumVendor ? <PremiumVendorChip /> : null}
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">
           Update your name, photo
           {isVendor ? ", and business name" : ""}.
@@ -200,7 +206,7 @@ export function ProfileManagement() {
       </div>
 
       <motion.div
-        className="mt-8 rounded-3xl border border-border/70 bg-card/80 p-6 shadow-elevated backdrop-blur-2xl sm:p-8 lg:p-10"
+        className="mt-8 premium-card account-surface rounded-3xl p-6 shadow-elevated sm:p-8 lg:p-10"
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -236,7 +242,7 @@ export function ProfileManagement() {
                   onChange={(event) => updateField("name", event.target.value)}
                   aria-invalid={Boolean(errors.name)}
                   aria-describedby={errors.name ? "profile-name-error" : undefined}
-                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                  className="premium-input h-11"
                   placeholder="Your name"
                 />
                 {errors.name ? (
@@ -266,7 +272,7 @@ export function ProfileManagement() {
                     aria-describedby={
                       errors.businessName ? "profile-business-error" : undefined
                     }
-                    className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                    className="premium-input h-11"
                     placeholder="Your business name"
                   />
                   {errors.businessName ? (
@@ -288,7 +294,7 @@ export function ProfileManagement() {
                   type="email"
                   value={user.email ?? ""}
                   readOnly
-                  className="h-11 w-full cursor-not-allowed rounded-lg border border-border/70 bg-muted/60 px-3 text-sm text-muted-foreground"
+                  className="read-only-field"
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
                   Email cannot be changed.
@@ -303,7 +309,7 @@ export function ProfileManagement() {
                   type="text"
                   value={role ?? ""}
                   readOnly
-                  className="h-11 w-full cursor-not-allowed rounded-lg border border-border/70 bg-muted/60 px-3 text-sm capitalize text-muted-foreground"
+                  className="read-only-field capitalize"
                 />
               </div>
             </div>

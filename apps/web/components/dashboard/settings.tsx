@@ -78,7 +78,7 @@ export function SettingsPage() {
       </div>
 
       <motion.div
-        className="mt-8 rounded-3xl border border-border/70 bg-card/80 p-6 shadow-elevated backdrop-blur-2xl sm:p-8 lg:p-10"
+        className="mt-8 premium-card rounded-3xl p-6 shadow-elevated sm:p-8 lg:p-10"
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -124,7 +124,7 @@ export function SettingsPage() {
       </motion.div>
 
       <motion.div
-        className="mt-8 rounded-3xl border border-border/70 bg-card/80 p-6 shadow-elevated backdrop-blur-2xl sm:p-8 lg:p-10"
+        className="mt-8 premium-card rounded-3xl p-6 shadow-elevated sm:p-8 lg:p-10"
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

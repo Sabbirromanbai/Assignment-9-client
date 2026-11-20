@@ -13,7 +13,11 @@ import {
   fetchVendorDashboard,
   type VendorDashboardData,
 } from "@/lib/api"
+import { PremiumSkeleton } from "@/components/premium-ui"
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
+import { usePremiumVendor } from "@/components/premium-provider"
 import { useToast } from "@/components/toast-provider"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 
 type ViewStatus = "loading" | "success" | "error"
 
@@ -31,8 +35,8 @@ function formatExpiry(value: string | null) {
 function SubscriptionSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="h-40 animate-pulse rounded-2xl border border-border/70 bg-muted/60" />
-      <div className="h-64 animate-pulse rounded-2xl border border-border/70 bg-muted/60" />
+      <PremiumSkeleton className="h-40 rounded-2xl" />
+      <PremiumSkeleton className="h-64 rounded-2xl" />
     </div>
   )
 }
@@ -40,6 +44,7 @@ function SubscriptionSkeleton() {
 export function VendorSubscription() {
   const reduceMotion = useReducedMotion()
   const { toast } = useToast()
+  const { refresh: refreshPremiumStatus } = usePremiumVendor()
 
   const [data, setData] = React.useState<VendorDashboardData | null>(null)
   const [status, setStatus] = React.useState<ViewStatus>("loading")
@@ -105,6 +110,7 @@ export function VendorSubscription() {
             : "Premium will end at the current billing period.",
       })
       setReloadKey((value) => value + 1)
+      refreshPremiumStatus()
     } catch (caughtError) {
       toast({
         variant: "error",
@@ -119,7 +125,7 @@ export function VendorSubscription() {
     }
   }
 
-  const isPremium = data?.subscriptionPlan === "premium"
+  const isPremium = isActivePremiumSubscription(data)
   const expiry = formatExpiry(data?.subscriptionExpiresAt ?? null)
 
   return (
@@ -180,13 +186,17 @@ export function VendorSubscription() {
                   <p className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
                     Current plan
                   </p>
-                  <h2 className="mt-2 flex items-center gap-2 font-heading text-2xl font-bold tracking-tight capitalize">
+                  <h2 className="mt-2 flex flex-wrap items-center gap-2 font-heading text-2xl font-bold tracking-tight capitalize">
                     {isPremium ? (
-                      <Crown className="size-6 text-primary" aria-hidden="true" />
+                      <Crown
+                        className="size-6 text-[var(--premium-gold)]"
+                        aria-hidden="true"
+                      />
                     ) : (
                       <ShieldCheck className="size-6 text-primary" aria-hidden="true" />
                     )}
                     {data.subscriptionPlan} plan
+                    {isPremium ? <PremiumVendorChip compact /> : null}
                   </h2>
                   <p className="mt-2 max-w-md text-sm text-muted-foreground">
                     {isPremium

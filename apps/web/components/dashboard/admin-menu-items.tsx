@@ -8,6 +8,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumSkeleton } from "@/components/premium-ui"
 import {
   deleteAdminMenuItem,
   fetchAdminMenuItems,
@@ -173,10 +174,7 @@ export function AdminMenuItems() {
         {status === "loading" ? (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-24 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-              />
+              <PremiumSkeleton key={index} className="h-24 rounded-2xl" />
             ))}
           </div>
         ) : null}

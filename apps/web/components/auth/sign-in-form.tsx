@@ -211,7 +211,7 @@ export function SignInForm({
         transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.545_0.21_27.5/0.08),transparent_45%)]" aria-hidden="true" />
-        <div className="relative w-full max-w-md rounded-3xl border border-border/60 bg-card/72 p-6 shadow-elevated backdrop-blur-2xl sm:p-8">
+        <div className="premium-card relative w-full max-w-md rounded-3xl p-6 shadow-elevated sm:p-8">
           <div className="mb-8">
             <p className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
               Account
@@ -245,7 +245,7 @@ export function SignInForm({
                 onChange={(event) => updateField("email", event.target.value)}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? "sign-in-email-error" : undefined}
-                className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                className="premium-input h-11"
                 placeholder="you@example.com"
               />
               {errors.email ? (
@@ -283,7 +283,7 @@ export function SignInForm({
                   aria-describedby={
                     errors.password ? "sign-in-password-error" : undefined
                   }
-                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 pr-11 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                  className="premium-input h-11 pr-11"
                   placeholder="Enter your password"
                 />
                 <button

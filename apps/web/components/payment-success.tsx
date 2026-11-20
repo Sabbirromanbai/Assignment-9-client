@@ -9,8 +9,10 @@ import { motion, useReducedMotion } from "motion/react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { usePremiumVendor } from "@/components/premium-provider"
 import { fetchVendorDashboard } from "@/lib/api"
 import { useAuthSession } from "@/lib/auth"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 
 type Status = "pending" | "success" | "timeout" | "error"
 
@@ -19,6 +21,7 @@ export function PaymentSuccess() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
   const { isPending: sessionPending, isAuthenticated } = useAuthSession()
+  const { refresh: refreshPremiumStatus } = usePremiumVendor()
 
   const [status, setStatus] = React.useState<Status>("pending")
   const [attempts, setAttempts] = React.useState(0)
@@ -40,8 +43,11 @@ export function PaymentSuccess() {
         setAttempts(attempt)
         try {
           const data = await fetchVendorDashboard()
-          if (data.subscriptionPlan === "premium") {
-            if (!cancelled) setStatus("success")
+          if (isActivePremiumSubscription(data)) {
+            if (!cancelled) {
+              setStatus("success")
+              refreshPremiumStatus()
+            }
             return
           }
         } catch {
@@ -56,7 +62,7 @@ export function PaymentSuccess() {
     return () => {
       cancelled = true
     }
-  }, [sessionPending, isAuthenticated])
+  }, [sessionPending, isAuthenticated, refreshPremiumStatus])
 
   return (
     <section className="mx-auto flex min-h-[60svh] w-full max-w-3xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">

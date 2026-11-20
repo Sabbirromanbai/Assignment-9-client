@@ -18,6 +18,7 @@ export type VendorProfile = {
   image: string | null
   businessName: string | null
   subscriptionPlan: "free" | "premium"
+  subscriptionExpiresAt?: string | null
 }
 
 export const API_BASE_URL =

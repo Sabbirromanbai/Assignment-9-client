@@ -25,7 +25,10 @@ import {
   type MenuItem,
   type VendorProfile,
 } from "@/lib/api"
+import { PremiumSkeleton } from "@/components/premium-ui"
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
 import { useAuthSession } from "@/lib/auth"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 import { useToast } from "@/components/toast-provider"
 
 type MenuItemDetailsProps = {
@@ -45,13 +48,13 @@ function DetailSkeleton() {
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
+        <PremiumSkeleton className="aspect-[4/3] rounded-2xl" />
         <div className="space-y-4">
-          <div className="h-6 w-24 animate-pulse rounded bg-muted" />
-          <div className="h-10 w-3/4 animate-pulse rounded bg-muted" />
-          <div className="h-7 w-1/3 animate-pulse rounded bg-muted" />
-          <div className="h-24 animate-pulse rounded bg-muted" />
-          <div className="h-10 animate-pulse rounded-lg bg-muted" />
+          <PremiumSkeleton className="h-6 w-24 rounded" />
+          <PremiumSkeleton className="h-10 w-3/4 rounded" />
+          <PremiumSkeleton className="h-7 w-1/3 rounded" />
+          <PremiumSkeleton className="h-24 rounded" />
+          <PremiumSkeleton className="h-10 rounded-lg" />
         </div>
       </div>
     </section>
@@ -385,7 +388,7 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
               />
               <span>{item.location}</span>
             </div>
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex flex-wrap items-center gap-3 text-sm">
               <Store
                 className="size-4 shrink-0 text-primary"
                 aria-hidden="true"
@@ -393,6 +396,9 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
               <span>
                 {vendor?.businessName || vendor?.name || "Vendor unavailable"}
               </span>
+              {vendor && isActivePremiumSubscription(vendor) ? (
+                <PremiumVendorChip compact />
+              ) : null}
             </div>
           </div>
 
@@ -467,7 +473,7 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
                       aria-describedby={
                         orderErrors.deliveryDate ? "order-date-error" : undefined
                       }
-                      className="h-11 w-full rounded-lg border border-border/70 bg-background/70 pl-10 pr-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary/25"
+                      className="premium-input h-11 pl-10"
                     />
                   </div>
                   {orderErrors.deliveryDate ? (

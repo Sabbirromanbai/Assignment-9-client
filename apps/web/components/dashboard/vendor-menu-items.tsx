@@ -33,6 +33,7 @@ import {
   type UpdateMenuItemInput,
 } from "@/lib/api"
 import { PIZZA_CATEGORIES, type PizzaCategory } from "@/lib/dashboard-nav"
+import { PremiumSkeleton } from "@/components/premium-ui"
 import { ProfileImageUpload } from "@/components/profile-image-upload"
 import { useToast } from "@/components/toast-provider"
 
@@ -93,10 +94,7 @@ function MenuItemsSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-28 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-        />
+        <PremiumSkeleton key={i} className="h-28 rounded-2xl" />
       ))}
     </div>
   )
@@ -309,8 +307,7 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
     }
   }
 
-  const inputClass =
-    "h-11 w-full rounded-lg border border-border/70 bg-background/70 px-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+  const inputClass = "premium-input h-11"
 
   return (
     <div
@@ -426,7 +423,7 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
               value={values.description}
               onChange={(e) => update("description", e.target.value)}
               aria-invalid={Boolean(errors.description)}
-              className="h-24 w-full rounded-lg border border-border/70 bg-background/70 px-3 py-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+              className="premium-input h-24 resize-y py-3"
               placeholder="Describe your menu item..."
             />
             {errors.description ? (
@@ -456,7 +453,7 @@ function EditModal({ item, onClose, onSaved }: EditModalProps) {
                   value={values.price}
                   onChange={(e) => update("price", e.target.value)}
                   aria-invalid={Boolean(errors.price)}
-                  className="h-11 w-full rounded-lg border border-border/70 bg-background/70 pl-10 pr-3 text-sm outline-none backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25"
+                  className="premium-input h-11 pl-10"
                   placeholder="0.00"
                 />
               </div>
@@ -576,7 +573,7 @@ function MenuItemCard({
 
   return (
     <motion.div
-      className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-card backdrop-blur-sm transition-shadow hover:shadow-elevated"
+      className="group relative overflow-hidden premium-card transition-shadow hover:shadow-elevated"
       initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{

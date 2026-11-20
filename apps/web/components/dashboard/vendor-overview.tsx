@@ -18,7 +18,14 @@ import type { LucideIcon } from "lucide-react"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { PremiumVendorChip } from "@/components/premium-vendor-mark"
+import {
+  AnimatedCounter,
+  PremiumSkeleton,
+  TiltCard,
+} from "@/components/premium-ui"
 import { fetchVendorDashboard, type VendorDashboardData } from "@/lib/api"
+import { isActivePremiumSubscription } from "@/lib/subscription"
 
 type Status = "loading" | "success" | "empty" | "error"
 
@@ -38,8 +45,8 @@ function StatCard({
   reduceMotion: boolean | null
 }) {
   return (
-    <motion.div
-      className="relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-5 shadow-card backdrop-blur-sm"
+    <TiltCard
+      className="relative overflow-hidden p-5"
       initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -52,15 +59,15 @@ function StatCard({
         <div>
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="mt-3 font-heading text-3xl font-bold tracking-tight tabular-nums">
-            {value}
+            <AnimatedCounter value={value} />
           </p>
           <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
         </div>
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-tomato/12 to-brand-orange/16 text-brand-orange">
           <Icon className="size-5" aria-hidden="true" />
         </span>
       </div>
-    </motion.div>
+    </TiltCard>
   )
 }
 
@@ -69,13 +76,10 @@ function OverviewSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-36 animate-pulse rounded-2xl border border-border/70 bg-muted/60"
-          />
+          <PremiumSkeleton key={index} className="h-36 rounded-2xl" />
         ))}
       </div>
-      <div className="h-44 animate-pulse rounded-2xl border border-border/70 bg-muted/60" />
+      <PremiumSkeleton className="h-44 rounded-2xl" />
     </div>
   )
 }
@@ -195,7 +199,7 @@ export function VendorOverview() {
     },
   ]
 
-  const isPremium = data.subscriptionPlan === "premium"
+  const isPremium = isActivePremiumSubscription(data)
 
   return (
     <div className="space-y-6">
@@ -232,9 +236,12 @@ export function VendorOverview() {
             <p className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
               Subscription
             </p>
-            <h2 className="mt-2 flex items-center gap-2 font-heading text-2xl font-bold tracking-tight capitalize">
+            <h2 className="mt-2 flex flex-wrap items-center gap-2 font-heading text-2xl font-bold tracking-tight capitalize">
               {isPremium ? (
-                <Crown className="size-6 text-primary" aria-hidden="true" />
+                <Crown
+                  className="size-6 text-[var(--premium-gold)]"
+                  aria-hidden="true"
+                />
               ) : (
                 <BadgeCheck
                   className="size-6 text-primary"
@@ -242,6 +249,7 @@ export function VendorOverview() {
                 />
               )}
               {data.subscriptionPlan} plan
+              {isPremium ? <PremiumVendorChip compact /> : null}
             </h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
               {isPremium

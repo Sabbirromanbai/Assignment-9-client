@@ -55,7 +55,7 @@ export function WhyChoosePizzabari() {
           return (
             <motion.article
               key={feature.title}
-              className="group rounded-2xl border border-border/70 bg-card p-6 shadow-card transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
+              className="group premium-card p-6 transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-elevated"
               initial={reduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}

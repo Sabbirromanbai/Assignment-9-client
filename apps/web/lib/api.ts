@@ -287,6 +287,30 @@ export async function createCheckoutSession(
   return response.data.url
 }
 
+export type SubscriptionVerification = {
+  activated: boolean
+  subscriptionPlan: "free" | "premium"
+  subscriptionExpiresAt: string
+  transactionId: string
+}
+
+export async function verifySubscriptionSession(
+  sessionId: string,
+  signal?: AbortSignal
+): Promise<SubscriptionVerification> {
+  const response = await fetchWithAuth<SubscriptionVerification>(
+    "/api/subscriptions/verify-session",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+    },
+    signal
+  )
+
+  return response.data
+}
+
 export async function cancelPremiumSubscription(
   signal?: AbortSignal
 ): Promise<{ cancelAt: number | null }> {

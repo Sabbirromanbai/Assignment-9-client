@@ -10,7 +10,7 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { usePremiumVendor } from "@/components/premium-provider"
-import { fetchVendorDashboard } from "@/lib/api"
+import { fetchVendorDashboard, verifySubscriptionSession } from "@/lib/api"
 import { useAuthSession } from "@/lib/auth"
 import { isActivePremiumSubscription } from "@/lib/subscription"
 
@@ -37,19 +37,33 @@ export function PaymentSuccess() {
     let attempt = 0
     const maxAttempts = 15
 
-    async function poll() {
+    async function isPremiumActive() {
+      const data = await fetchVendorDashboard()
+      if (isActivePremiumSubscription(data)) {
+        if (!cancelled) {
+          setStatus("success")
+          refreshPremiumStatus()
+        }
+        return true
+      }
+      return false
+    }
+
+    async function confirm() {
+      if (sessionId) {
+        try {
+          await verifySubscriptionSession(sessionId)
+          if (await isPremiumActive()) return
+        } catch {
+          // The webhook may still be processing. Keep polling the dashboard.
+        }
+      }
+
       while (!cancelled && attempt < maxAttempts) {
         attempt += 1
         setAttempts(attempt)
         try {
-          const data = await fetchVendorDashboard()
-          if (isActivePremiumSubscription(data)) {
-            if (!cancelled) {
-              setStatus("success")
-              refreshPremiumStatus()
-            }
-            return
-          }
+          if (await isPremiumActive()) return
         } catch {
           // keep polling; auth or network may be settling
         }
@@ -58,11 +72,11 @@ export function PaymentSuccess() {
       if (!cancelled) setStatus("timeout")
     }
 
-    void poll()
+    void confirm()
     return () => {
       cancelled = true
     }
-  }, [sessionPending, isAuthenticated, refreshPremiumStatus])
+  }, [sessionPending, isAuthenticated, refreshPremiumStatus, sessionId])
 
   return (
     <section className="mx-auto flex min-h-[60svh] w-full max-w-3xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">

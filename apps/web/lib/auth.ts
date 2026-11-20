@@ -32,9 +32,10 @@ type SessionLike = {
   user?: AuthUser | null
 }
 
-// There is no dedicated vendor application route in this app yet. When one is
-// added, point this at it and the Hero CTA will use it automatically.
-const VENDOR_APPLICATION_HREF: string | null = null
+// The existing vendor application/registration page is the shared sign-up
+// page, which supports the "vendor" role. No separate vendor-application
+// route exists in this app, so the Hero CTA reuses it.
+const VENDOR_APPLICATION_HREF: string = "/sign-up"
 
 const GUEST_VENDOR_CTA_HREF = `/sign-in?callbackURL=${encodeURIComponent(
   "/dashboard"

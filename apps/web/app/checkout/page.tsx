@@ -17,6 +17,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { createOrder } from "@/lib/api"
 import { useAuthSession } from "@/lib/auth"
+import { useToast } from "@/components/toast-provider"
 
 const PENDING_ORDER_STORAGE_KEY = "pizzabari-pending-order"
 const PAYMENT_DELAY_MS = 1200
@@ -100,6 +101,7 @@ function CheckoutSkeleton() {
 export default function CheckoutPage() {
   const router = useRouter()
   const { isPending, isAuthenticated } = useAuthSession()
+  const { toast } = useToast()
   const [order, setOrder] = React.useState<PendingOrder | null>(null)
   const [hasLoadedOrder, setHasLoadedOrder] = React.useState(false)
   const [isProcessing, setIsProcessing] = React.useState(false)
@@ -147,6 +149,11 @@ export default function CheckoutPage() {
         message: order.message || undefined,
       })
       window.sessionStorage.removeItem(PENDING_ORDER_STORAGE_KEY)
+      toast({
+        variant: "success",
+        title: "Order placed successfully!",
+        description: "Your order has been placed successfully.",
+      })
       setIsComplete(true)
     } catch (caughtError) {
       setError(

@@ -236,7 +236,7 @@ export function AdminTransactions() {
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Vendor: {transaction.vendorId}
+                      Vendor: {transaction.vendorName || transaction.vendorId}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Session: {transaction.stripeSessionId}

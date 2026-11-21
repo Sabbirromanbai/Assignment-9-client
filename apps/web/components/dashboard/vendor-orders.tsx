@@ -302,7 +302,11 @@ export function VendorOrders() {
                         <div className="flex items-center gap-2">
                           <User className="size-4 shrink-0 text-primary" aria-hidden="true" />
                           <span className="truncate">
-                            Customer {shortId(order.customerId)}
+                            {order.customerName ||
+                              `Customer ${shortId(order.customerId)}`}
+                            {order.customerEmail
+                              ? ` · ${order.customerEmail}`
+                              : null}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">

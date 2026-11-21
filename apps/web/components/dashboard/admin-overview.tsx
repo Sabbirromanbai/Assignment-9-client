@@ -4,6 +4,18 @@ import * as React from "react"
 import Link from "next/link"
 import { AlertCircle, CreditCard, Pizza, RefreshCw, ShieldCheck, Users } from "lucide-react"
 import { useReducedMotion } from "motion/react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -13,10 +25,245 @@ import {
   PremiumSkeleton,
   TiltCard,
 } from "@/components/premium-ui"
-import { fetchAdminDashboard, type AdminDashboardData } from "@/lib/api"
+import {
+  fetchAdminDashboard,
+  type AdminDashboardData,
+  type DailyRevenuePoint,
+} from "@/lib/api"
 import { useToast } from "@/components/toast-provider"
 
 type Status = "loading" | "success" | "error"
+
+type RangeDays = 7 | 30
+
+const REVENUE_CURRENCY = "USD"
+
+const CHART_COLORS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+]
+
+const TOOLTIP_STYLE: React.CSSProperties = {
+  background: "var(--card)",
+  border: "1px solid var(--border)",
+  borderRadius: "0.75rem",
+  color: "var(--card-foreground)",
+  fontSize: "0.75rem",
+  boxShadow: "var(--elevation-card)",
+}
+
+function formatChartDay(value: string) {
+  const date = new Date(`${value}T00:00:00Z`)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  })
+}
+
+function formatRevenue(cents: number, maximumFractionDigits = 2) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: REVENUE_CURRENCY,
+    maximumFractionDigits,
+  }).format(cents / 100)
+}
+
+function ChartCard({
+  title,
+  description,
+  action,
+  children,
+}: {
+  title: string
+  description: string
+  action?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-card backdrop-blur-sm sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-heading text-lg font-semibold tracking-tight">
+            {title}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        </div>
+        {action}
+      </div>
+      <div className="mt-5">{children}</div>
+    </div>
+  )
+}
+
+function RangeToggle({
+  value,
+  onChange,
+}: {
+  value: RangeDays
+  onChange: (value: RangeDays) => void
+}) {
+  return (
+    <div className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/60 p-1">
+      {([7, 30] as const).map((range) => (
+        <button
+          key={range}
+          type="button"
+          onClick={() => onChange(range)}
+          aria-pressed={value === range}
+          className={cn(
+            "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+            value === range
+              ? "bg-primary text-primary-foreground shadow-soft"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {range} days
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function EmptyChart() {
+  return (
+    <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+      No data yet
+    </div>
+  )
+}
+
+function DailyRevenueChart({
+  series,
+  range,
+  reduceMotion,
+}: {
+  series: DailyRevenuePoint[]
+  range: RangeDays
+  reduceMotion: boolean | null
+}) {
+  const points = series.slice(-range)
+
+  if (points.length === 0 || points.every((point) => point.revenue === 0)) {
+    return <EmptyChart />
+  }
+
+  return (
+    <div className="h-64 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--border)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatChartDay}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            minTickGap={16}
+          />
+          <YAxis
+            tickFormatter={(value) => formatRevenue(Number(value), 0)}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            width={56}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)" }}
+            contentStyle={TOOLTIP_STYLE}
+            labelStyle={{ color: "var(--foreground)" }}
+            labelFormatter={(label) => formatChartDay(String(label))}
+            formatter={(value) => [formatRevenue(Number(value)), "Revenue"]}
+          />
+          <Bar
+            dataKey="revenue"
+            name="Revenue"
+            fill="var(--chart-2)"
+            radius={[6, 6, 0, 0]}
+            maxBarSize={36}
+            isAnimationActive={!reduceMotion}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+function RoleDonut({
+  slices,
+  reduceMotion,
+}: {
+  slices: { label: string; value: number }[]
+  reduceMotion: boolean | null
+}) {
+  const data = slices.filter((slice) => slice.value > 0)
+
+  if (data.length === 0) {
+    return <EmptyChart />
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-6 sm:flex-row">
+      <div className="h-56 w-full sm:w-1/2">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="label"
+              innerRadius="58%"
+              outerRadius="82%"
+              paddingAngle={2}
+              stroke="var(--card)"
+              strokeWidth={2}
+              isAnimationActive={!reduceMotion}
+            >
+              {data.map((slice, index) => (
+                <Cell
+                  key={slice.label}
+                  fill={CHART_COLORS[index % CHART_COLORS.length]}
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="w-full space-y-2 sm:w-1/2">
+        {data.map((slice, index) => (
+          <li
+            key={slice.label}
+            className="flex items-center justify-between gap-3 text-sm"
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="size-2.5 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
+                }}
+              />
+              <span className="truncate">{slice.label}</span>
+            </span>
+            <span className="shrink-0 font-medium tabular-nums">
+              {slice.value}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function StatCard({
   label,
@@ -76,6 +323,7 @@ export function AdminOverview() {
   const [status, setStatus] = React.useState<Status>("loading")
   const [error, setError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
+  const [range, setRange] = React.useState<RangeDays>(7)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -193,6 +441,32 @@ export function AdminOverview() {
             reduceMotion={reduceMotion}
           />
         ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="Daily revenue"
+          description={`Paid transactions over the last ${range} days.`}
+          action={<RangeToggle value={range} onChange={setRange} />}
+        >
+          <DailyRevenueChart
+            series={data?.dailyRevenue ?? []}
+            range={range}
+            reduceMotion={reduceMotion}
+          />
+        </ChartCard>
+        <ChartCard
+          title="Users by role"
+          description="Registered vendors and customers."
+        >
+          <RoleDonut
+            slices={[
+              { label: "Vendors", value: data?.vendors ?? 0 },
+              { label: "Customers", value: data?.customers ?? 0 },
+            ]}
+            reduceMotion={reduceMotion}
+          />
+        </ChartCard>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

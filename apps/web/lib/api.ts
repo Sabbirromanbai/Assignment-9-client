@@ -31,11 +31,28 @@ export type MenuFilters = {
   sort?: "newest" | "price_asc" | "price_desc"
 }
 
+export type DailyOrderPoint = {
+  date: string
+  orders: number
+}
+
+export type CategoryBreakdownEntry = {
+  category: string
+  orders: number
+}
+
+export type DailyRevenuePoint = {
+  date: string
+  revenue: number
+}
+
 export type VendorDashboardData = {
   totalMenuItems: number
   activeMenuItems: number
   pendingOrders: number
   acceptedOrders: number
+  dailyOrders: DailyOrderPoint[]
+  categoryBreakdown: CategoryBreakdownEntry[]
   subscriptionPlan: "free" | "premium"
   subscriptionExpiresAt: string | null
 }
@@ -232,6 +249,7 @@ export type CustomerDashboardData = {
   pendingOrders: number
   acceptedOrders: number
   rejectedOrders: number
+  dailyOrders: DailyOrderPoint[]
 }
 
 export async function fetchCustomerDashboard(
@@ -382,6 +400,7 @@ export type AdminDashboardData = {
   totalMenuItems: number
   pendingMenuItems: number
   totalTransactions: number
+  dailyRevenue: DailyRevenuePoint[]
 }
 
 export type AdminUser = {

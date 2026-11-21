@@ -14,6 +14,18 @@ import {
 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 import type { LucideIcon } from "lucide-react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -24,10 +36,236 @@ import {
   PremiumSkeleton,
   TiltCard,
 } from "@/components/premium-ui"
-import { fetchVendorDashboard, type VendorDashboardData } from "@/lib/api"
+import {
+  fetchVendorDashboard,
+  type CategoryBreakdownEntry,
+  type DailyOrderPoint,
+  type VendorDashboardData,
+} from "@/lib/api"
 import { isActivePremiumSubscription } from "@/lib/subscription"
 
 type Status = "loading" | "success" | "empty" | "error"
+
+type RangeDays = 7 | 30
+
+const CHART_COLORS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+]
+
+const TOOLTIP_STYLE: React.CSSProperties = {
+  background: "var(--card)",
+  border: "1px solid var(--border)",
+  borderRadius: "0.75rem",
+  color: "var(--card-foreground)",
+  fontSize: "0.75rem",
+  boxShadow: "var(--elevation-card)",
+}
+
+function formatChartDay(value: string) {
+  const date = new Date(`${value}T00:00:00Z`)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  })
+}
+
+function ChartCard({
+  title,
+  description,
+  action,
+  children,
+}: {
+  title: string
+  description: string
+  action?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-card backdrop-blur-sm sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-heading text-lg font-semibold tracking-tight">
+            {title}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        </div>
+        {action}
+      </div>
+      <div className="mt-5">{children}</div>
+    </div>
+  )
+}
+
+function RangeToggle({
+  value,
+  onChange,
+}: {
+  value: RangeDays
+  onChange: (value: RangeDays) => void
+}) {
+  return (
+    <div className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/60 p-1">
+      {([7, 30] as const).map((range) => (
+        <button
+          key={range}
+          type="button"
+          onClick={() => onChange(range)}
+          aria-pressed={value === range}
+          className={cn(
+            "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+            value === range
+              ? "bg-primary text-primary-foreground shadow-soft"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {range} days
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function EmptyChart() {
+  return (
+    <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+      No data yet
+    </div>
+  )
+}
+
+function DailyOrdersChart({
+  series,
+  range,
+  reduceMotion,
+}: {
+  series: DailyOrderPoint[]
+  range: RangeDays
+  reduceMotion: boolean | null
+}) {
+  const points = series.slice(-range)
+
+  if (points.length === 0 || points.every((point) => point.orders === 0)) {
+    return <EmptyChart />
+  }
+
+  return (
+    <div className="h-64 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--border)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatChartDay}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            minTickGap={16}
+          />
+          <YAxis
+            allowDecimals={false}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            width={36}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)" }}
+            contentStyle={TOOLTIP_STYLE}
+            labelStyle={{ color: "var(--foreground)" }}
+            labelFormatter={(label) => formatChartDay(String(label))}
+          />
+          <Bar
+            dataKey="orders"
+            name="Orders"
+            fill="var(--chart-1)"
+            radius={[6, 6, 0, 0]}
+            maxBarSize={36}
+            isAnimationActive={!reduceMotion}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+function CategoryDonut({
+  entries,
+  reduceMotion,
+}: {
+  entries: CategoryBreakdownEntry[]
+  reduceMotion: boolean | null
+}) {
+  const slices = entries.filter((entry) => entry.orders > 0)
+  const total = slices.reduce((sum, entry) => sum + entry.orders, 0)
+
+  if (total === 0) {
+    return <EmptyChart />
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-6 sm:flex-row">
+      <div className="h-56 w-full sm:w-1/2">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Pie
+              data={slices}
+              dataKey="orders"
+              nameKey="category"
+              innerRadius="58%"
+              outerRadius="82%"
+              paddingAngle={2}
+              stroke="var(--card)"
+              strokeWidth={2}
+              isAnimationActive={!reduceMotion}
+            >
+              {slices.map((entry, index) => (
+                <Cell
+                  key={entry.category}
+                  fill={CHART_COLORS[index % CHART_COLORS.length]}
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="w-full space-y-2 sm:w-1/2">
+        {slices.map((entry, index) => (
+          <li
+            key={entry.category}
+            className="flex items-center justify-between gap-3 text-sm"
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="size-2.5 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
+                }}
+              />
+              <span className="truncate">{entry.category}</span>
+            </span>
+            <span className="shrink-0 font-medium tabular-nums">
+              {entry.orders}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function StatCard({
   label,
@@ -90,6 +328,7 @@ export function VendorOverview() {
   const [status, setStatus] = React.useState<Status>("loading")
   const [error, setError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
+  const [range, setRange] = React.useState<RangeDays>(7)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -201,6 +440,9 @@ export function VendorOverview() {
 
   const isPremium = isActivePremiumSubscription(data)
 
+  const dailyOrders = data.dailyOrders ?? []
+  const categoryBreakdown = data.categoryBreakdown ?? []
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -215,6 +457,29 @@ export function VendorOverview() {
             reduceMotion={reduceMotion}
           />
         ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="Daily orders"
+          description={`Orders placed over the last ${range} days.`}
+          action={<RangeToggle value={range} onChange={setRange} />}
+        >
+          <DailyOrdersChart
+            series={dailyOrders}
+            range={range}
+            reduceMotion={reduceMotion}
+          />
+        </ChartCard>
+        <ChartCard
+          title="Orders by category"
+          description="How your orders split across menu categories."
+        >
+          <CategoryDonut
+            entries={categoryBreakdown}
+            reduceMotion={reduceMotion}
+          />
+        </ChartCard>
       </div>
 
       <motion.div

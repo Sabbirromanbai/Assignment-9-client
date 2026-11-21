@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  ShoppingBag,
   User,
   X,
   type LucideIcon,
@@ -171,7 +172,7 @@ export function Navbar() {
 
   React.useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 12)
+      setScrolled(window.scrollY > 8)
     }
 
     handleScroll()
@@ -302,10 +303,12 @@ export function Navbar() {
     <motion.header
       initial={reduceMotion ? false : { y: -18, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, ease: EASE }}
+      transition={{ duration: 0.4, ease: EASE }}
       className={cn(
-        "sticky top-0 z-50 border-b border-border/70 bg-background/75 backdrop-blur-2xl transition-[background-color,box-shadow,border-color] duration-300 supports-[backdrop-filter]:bg-background/65",
-        scrolled && "bg-background/90 shadow-card supports-[backdrop-filter]:bg-background/78"
+        "sticky top-0 z-50 border-b bg-background/75 backdrop-blur-2xl transition-[background-color,box-shadow,border-color] duration-300 ease-smooth motion-reduce:transition-none supports-[backdrop-filter]:bg-background/65",
+        scrolled
+          ? "border-border bg-background/85 shadow-card supports-[backdrop-filter]:bg-background/80"
+          : "border-border/70"
       )}
     >
       <span
@@ -313,9 +316,20 @@ export function Navbar() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent opacity-70"
       />
 
-      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div
+        className={cn(
+          "relative mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 transition-[height] duration-300 ease-smooth motion-reduce:transition-none sm:px-6 lg:px-8",
+          scrolled ? "h-14" : "h-16"
+        )}
+      >
         <div className="flex min-w-0 items-center gap-6 lg:gap-8">
-          <Logo className="shrink-0" />
+          <motion.div
+            whileHover={reduceMotion ? undefined : { scale: 1.03 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="shrink-0"
+          >
+            <Logo className="shrink-0" />
+          </motion.div>
 
           <motion.nav
             aria-label="Primary"
@@ -367,7 +381,12 @@ export function Navbar() {
                             : { type: "spring", stiffness: 420, damping: 34 }
                         }
                       />
-                    ) : null}
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-0 -z-10 rounded-xl bg-accent/60 opacity-0 transition-opacity duration-200 ease-smooth group-hover/nav:opacity-100"
+                      />
+                    )}
                     <span className="relative z-10">{item.name}</span>
                     <span
                       aria-hidden="true"
@@ -394,6 +413,23 @@ export function Navbar() {
           />
 
           <div className="hidden items-center gap-2 md:flex">
+            {!isPending && role === "customer" ? (
+              <motion.div
+                whileHover={reduceMotion ? undefined : { y: -1, scale: 1.03 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.95 }}
+                transition={{ duration: 0.2, ease: EASE }}
+              >
+                <Link
+                  href="/dashboard/customer/orders"
+                  aria-label="My Orders"
+                  title="My Orders"
+                  className="inline-flex size-9 items-center justify-center rounded-xl border border-border/70 bg-card/70 text-muted-foreground shadow-soft outline-none backdrop-blur-xl transition-colors duration-200 hover:border-primary/25 hover:bg-accent/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+                >
+                  <ShoppingBag className="size-4" aria-hidden="true" />
+                </Link>
+              </motion.div>
+            ) : null}
+
             {isPending ? (
               <div className="flex items-center gap-2">
                 <PremiumSkeleton className="size-8 rounded-full" />
@@ -579,7 +615,10 @@ export function Navbar() {
                 >
                   <Link
                     href="/sign-up"
-                    className={cn(buttonVariants(), "shadow-soft hover:shadow-glow")}
+                    className={cn(
+                      buttonVariants(),
+                      "shadow-soft transition-shadow hover:shadow-glow"
+                    )}
                   >
                     Sign Up
                     <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -744,33 +783,65 @@ export function Navbar() {
                       ) : null}
                     </div>
 
+                    {role === "customer" ? (
+                      <Link
+                        href="/dashboard/customer/orders"
+                        aria-label="My Orders"
+                        title="My Orders"
+                        aria-current={
+                          isActive(pathname, "/dashboard/customer/orders")
+                            ? "page"
+                            : undefined
+                        }
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-xl border px-3 py-2 text-sm font-medium transition-colors duration-200",
+                          isActive(pathname, "/dashboard/customer/orders")
+                            ? "border-primary/25 bg-accent/70 text-accent-foreground"
+                            : "border-border/70 bg-card/70 text-muted-foreground hover:border-primary/25 hover:bg-accent/60 hover:text-foreground"
+                        )}
+                      >
+                        <ShoppingBag className="size-4" aria-hidden="true" />
+                        My Orders
+                      </Link>
+                    ) : null}
+
                     {roleItems.length > 0 ? (
                       <div className="flex flex-col gap-1 pt-1">
                         <p className="px-3 pb-1 text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
                           {visibleRoleLabel} workspace
                         </p>
-                        {roleItems.slice(0, 5).map((item) => {
-                          const active = isActive(pathname, item.href)
-                          const Icon = item.icon
-
-                          return (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              aria-current={active ? "page" : undefined}
-                              onClick={() => setOpen(false)}
-                              className={cn(
-                                "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors duration-200",
-                                active
-                                  ? "bg-accent/70 text-accent-foreground"
-                                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                              )}
-                            >
-                              <Icon className="size-4" aria-hidden="true" />
-                              {item.label}
-                            </Link>
+                        {roleItems
+                          .filter(
+                            (item) =>
+                              !(
+                                role === "customer" &&
+                                item.href === "/dashboard/customer/orders"
+                              )
                           )
-                        })}
+                          .slice(0, 5)
+                          .map((item) => {
+                            const active = isActive(pathname, item.href)
+                            const Icon = item.icon
+
+                            return (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                aria-current={active ? "page" : undefined}
+                                onClick={() => setOpen(false)}
+                                className={cn(
+                                  "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors duration-200",
+                                  active
+                                    ? "bg-accent/70 text-accent-foreground"
+                                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                )}
+                              >
+                                <Icon className="size-4" aria-hidden="true" />
+                                {item.label}
+                              </Link>
+                            )
+                          })}
                       </div>
                     ) : (
                       <Link

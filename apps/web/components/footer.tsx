@@ -14,11 +14,34 @@ const accountLinks = [
 ] as const
 
 const socialLinks = [
-  { name: "Facebook", href: "https://www.facebook.com/" },
-  { name: "X", href: "https://x.com/" },
-  { name: "Instagram", href: "https://www.instagram.com/" },
-  { name: "YouTube", href: "https://www.youtube.com/" },
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/",
+    hoverShadow:
+      "motion-safe:hover:shadow-[0_6px_16px_-4px_rgba(24,119,242,0.55)]",
+  },
+  {
+    name: "X",
+    href: "https://x.com/",
+    hoverShadow:
+      "motion-safe:hover:shadow-[0_6px_16px_-4px_color-mix(in_oklab,var(--foreground)_35%,transparent)]",
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/",
+    hoverShadow:
+      "motion-safe:hover:shadow-[0_6px_16px_-4px_rgba(255,1,105,0.55)]",
+  },
+  {
+    name: "YouTube",
+    href: "https://www.youtube.com/",
+    hoverShadow:
+      "motion-safe:hover:shadow-[0_6px_16px_-4px_rgba(255,0,0,0.5)]",
+  },
 ] as const
+
+const GLYPH_CLASS =
+  "size-[18px] transition-transform duration-300 ease-smooth motion-safe:group-hover:scale-110"
 
 type SocialPlatform = (typeof socialLinks)[number]["name"]
 
@@ -30,7 +53,7 @@ function SocialGlyph({ platform }: { platform: SocialPlatform }) {
           viewBox="0 0 24 24"
           aria-hidden="true"
           focusable="false"
-          className="size-[18px]"
+          className={GLYPH_CLASS}
         >
           <path
             fill="#1877F2"
@@ -44,7 +67,7 @@ function SocialGlyph({ platform }: { platform: SocialPlatform }) {
           viewBox="0 0 24 24"
           aria-hidden="true"
           focusable="false"
-          className="size-[18px] text-black dark:text-white"
+          className={`${GLYPH_CLASS} text-black dark:text-white`}
         >
           <path
             fill="currentColor"
@@ -58,7 +81,7 @@ function SocialGlyph({ platform }: { platform: SocialPlatform }) {
           viewBox="0 0 24 24"
           aria-hidden="true"
           focusable="false"
-          className="size-[18px]"
+          className={GLYPH_CLASS}
         >
           <defs>
             <linearGradient
@@ -87,7 +110,7 @@ function SocialGlyph({ platform }: { platform: SocialPlatform }) {
           viewBox="0 0 24 24"
           aria-hidden="true"
           focusable="false"
-          className="size-[18px]"
+          className={GLYPH_CLASS}
         >
           <path
             fill="#FF0000"
@@ -151,7 +174,7 @@ export function Footer() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={social.name}
-                  className="inline-flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground transition-colors duration-200 ease-smooth hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className={`group inline-flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground transition-all duration-300 ease-smooth hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-95 ${social.hoverShadow}`}
                 >
                   <SocialGlyph platform={social.name} />
                 </a>
@@ -173,14 +196,14 @@ export function Footer() {
                   aria-hidden="true"
                 />
                 <a
-                  href="https://www.google.com/maps/search/?api=1&query=123+Ember+Street+New+York+NY+10001"
+                  href="https://www.google.com/maps/search/?api=1&query=GEC+Circle+Chittagong"
                   target="_blank"
                   rel="noreferrer noopener"
                   className="transition-colors duration-200 ease-smooth hover:text-foreground"
                 >
-                  123 Ember Street
+                  GEC Circle
                   <br />
-                  New York, NY 10001
+                  Chittagong, Bangladesh
                 </a>
               </li>
               <li className="flex gap-3">
@@ -189,10 +212,10 @@ export function Footer() {
                   aria-hidden="true"
                 />
                 <a
-                  href="tel:+15550102030"
+                  href="tel:+8801608941748"
                   className="transition-colors duration-200 ease-smooth hover:text-foreground"
                 >
-                  +1 (555) 010-2030
+                  +880 1608-941748
                 </a>
               </li>
               <li className="flex gap-3">
@@ -201,10 +224,10 @@ export function Footer() {
                   aria-hidden="true"
                 />
                 <a
-                  href="mailto:hello@pizzabari.example"
+                  href="mailto:sabbirroman650@gmail.com"
                   className="transition-colors duration-200 ease-smooth hover:text-foreground"
                 >
-                  hello@pizzabari.example
+                  sabbirroman650@gmail.com
                 </a>
               </li>
               <li className="flex gap-3">

@@ -127,6 +127,28 @@ export async function updateVendorProfile(
   return response.data
 }
 
+export type UpdateCustomerProfileInput = {
+  name?: string
+  image?: string
+}
+
+export async function updateCustomerProfile(
+  input: UpdateCustomerProfileInput,
+  signal?: AbortSignal
+): Promise<VendorProfile> {
+  const response = await fetchWithAuth<VendorProfile>(
+    "/api/customers/profile",
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    signal
+  )
+
+  return response.data
+}
+
 export type ChooseRoleInput = {
   role: "customer" | "vendor"
 }
@@ -326,9 +348,11 @@ export async function createCheckoutSession(
 
 export type SubscriptionVerification = {
   activated: boolean
+  webhookProcessed: boolean
   subscriptionPlan: "free" | "premium"
-  subscriptionExpiresAt: string
+  subscriptionExpiresAt: string | null
   transactionId: string
+  transactionStatus: string
 }
 
 export async function verifySubscriptionSession(

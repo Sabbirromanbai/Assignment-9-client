@@ -52,8 +52,12 @@ export function PaymentSuccess() {
     async function confirm() {
       if (sessionId) {
         try {
-          await verifySubscriptionSession(sessionId)
-          if (await isPremiumActive()) return
+          const verification = await verifySubscriptionSession(sessionId)
+          if (verification.activated) {
+            setStatus("success")
+            refreshPremiumStatus()
+            return
+          }
         } catch {
           // The webhook may still be processing. Keep polling the dashboard.
         }

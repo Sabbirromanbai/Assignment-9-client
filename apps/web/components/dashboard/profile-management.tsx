@@ -11,7 +11,7 @@ import { useToast } from "@/components/toast-provider"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { API_BASE_URL, fetchWithAuth, updateVendorProfile, type VendorProfile } from "@/lib/api"
+import { API_BASE_URL, fetchWithAuth, updateVendorProfile, updateCustomerProfile, type VendorProfile } from "@/lib/api"
 import { useAuthSession } from "@/lib/auth"
 
 type ProfileValues = {
@@ -109,27 +109,11 @@ export function ProfileManagement() {
           businessName: values.businessName.trim() || undefined,
           image: values.image ?? undefined,
         })
-      }
-
-      const authResponse = await fetch(`${API_BASE_URL}/api/auth/update-user`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Origin: window.location.origin,
-        },
-        body: JSON.stringify({
+      } else {
+        await updateCustomerProfile({
           name: values.name.trim(),
-          image: values.image ?? null,
-        }),
-      })
-
-      if (!authResponse.ok) {
-        const payload = await authResponse.json().catch(() => null)
-        throw new Error(
-          payload?.message || "Failed to update profile"
-        )
+          image: values.image ?? undefined,
+        })
       }
 
       toast({

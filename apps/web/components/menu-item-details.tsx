@@ -3,6 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ArrowRight,
   Calendar,
@@ -62,6 +63,7 @@ function DetailSkeleton() {
 }
 
 export function MenuItemDetails({ id }: MenuItemDetailsProps) {
+  const router = useRouter()
   const reduceMotion = useReducedMotion()
   const { isPending: sessionPending, isAuthenticated, role } = useAuthSession()
   const { toast } = useToast()
@@ -145,6 +147,16 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
     return () => controller.abort()
   }, [id, reloadKey])
 
+  React.useEffect(() => {
+    if (sessionPending) {
+      return
+    }
+
+    if (!isAuthenticated) {
+      router.replace(`/sign-in?callbackURL=${encodeURIComponent(`/menu/${id}`)}`)
+    }
+  }, [sessionPending, isAuthenticated, id, router])
+
   function validateOrder() {
     const errors: Record<string, string> = {}
 
@@ -219,6 +231,10 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
 
   const images = item?.images ?? []
   const activeImage = images[selectedImage] ?? images[0]
+
+  if (sessionPending || !isAuthenticated) {
+    return <DetailSkeleton />
+  }
 
   if (status === "loading") {
     return <DetailSkeleton />

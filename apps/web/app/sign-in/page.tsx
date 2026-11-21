@@ -18,7 +18,7 @@ export default async function SignInPage({
   const callbackURL =
     requested?.startsWith("/") && !requested.startsWith("//")
       ? requested
-      : "/"
+      : "/dashboard"
 
   return <SignInForm callbackURL={callbackURL} />
 }

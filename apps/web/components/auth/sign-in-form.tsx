@@ -36,7 +36,7 @@ function validate(values: SignInValues) {
 }
 
 export function SignInForm({
-  callbackURL = "/",
+  callbackURL = "/dashboard",
 }: {
   callbackURL?: string
 }) {

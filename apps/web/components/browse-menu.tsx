@@ -15,6 +15,7 @@ import {
   type MenuFilters,
   type VendorProfile,
 } from "@/lib/api"
+import { PIZZA_CATEGORIES } from "@/lib/dashboard-nav"
 
 type BrowseMenuProps = {
   initialSearch?: string
@@ -128,13 +129,7 @@ export function BrowseMenu({
     return () => controller.abort()
   }, [search, category, location, sort, reloadKey])
 
-  const categories = React.useMemo(
-    () =>
-      [...new Set(allItems.map((item) => item.category).filter(Boolean))].sort(
-        (a, b) => a.localeCompare(b)
-      ),
-    [allItems]
-  )
+  const categories = PIZZA_CATEGORIES
 
   const locations = React.useMemo(
     () =>

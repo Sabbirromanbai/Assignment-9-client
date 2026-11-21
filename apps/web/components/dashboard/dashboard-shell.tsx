@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRight, LogOut, Menu, ShieldCheck, X } from "lucide-react"
+import { ChevronRight, Home, LogOut, Menu, ShieldCheck, X } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -126,6 +126,11 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
   const navItems = DASHBOARD_NAV[role]
   const activeHref = resolveNavItem(pathname, role)?.href
 
+  const exploreItems = [
+    { label: "Home", href: "/", icon: Home },
+    { label: "Browse Menu", href: "/menu", icon: Menu },
+  ] as const
+
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center border-b border-border/70 px-5">
@@ -166,6 +171,33 @@ export function DashboardShell({ role, user, children }: DashboardShellProps) {
           </div>
         </div>
       </div>
+
+      <nav aria-label="Explore" className="px-3 pb-4">
+        <p className="mb-2 text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
+          Explore
+        </p>
+        {exploreItems.map((item) => {
+          const Icon = item.icon
+          const active = pathname === item.href
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-all duration-300 ease-premium focus-visible:ring-2 focus-visible:ring-ring/60",
+                active
+                  ? "bg-[linear-gradient(110deg,var(--brand-tomato),var(--brand-orange))] text-white shadow-glow"
+                  : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+              )}
+            >
+              <Icon className="size-4 shrink-0" aria-hidden="true" />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
 
       <nav aria-label="Dashboard" className="flex-1 space-y-1 px-3">
         {navItems.map((item) => {

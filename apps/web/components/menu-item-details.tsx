@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import {
   ArrowRight,
   Calendar,
-  CheckCircle2,
   Loader2,
   MapPin,
   Pizza,
@@ -20,7 +19,6 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import {
-  createOrder,
   fetchMenuItems,
   fetchVendorProfile,
   type MenuItem,
@@ -30,7 +28,8 @@ import { PremiumSkeleton } from "@/components/premium-ui"
 import { PremiumVendorChip } from "@/components/premium-vendor-mark"
 import { useAuthSession } from "@/lib/auth"
 import { isActivePremiumSubscription } from "@/lib/subscription"
-import { useToast } from "@/components/toast-provider"
+
+const PENDING_ORDER_STORAGE_KEY = "pizzabari-pending-order"
 
 type MenuItemDetailsProps = {
   id: string
@@ -66,7 +65,6 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
   const router = useRouter()
   const reduceMotion = useReducedMotion()
   const { isPending: sessionPending, isAuthenticated, role } = useAuthSession()
-  const { toast } = useToast()
 
   const [item, setItem] = React.useState<MenuItem | null>(null)
   const [vendor, setVendor] = React.useState<VendorProfile | null>(null)
@@ -84,8 +82,6 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
     message: "",
   })
   const [orderErrors, setOrderErrors] = React.useState<Record<string, string>>({})
-  const [isSubmittingOrder, setIsSubmittingOrder] = React.useState(false)
-  const [orderSuccess, setOrderSuccess] = React.useState(false)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -181,51 +177,31 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
     return Object.keys(errors).length === 0
   }
 
-  function friendlyOrderError(message: string) {
-    if (message.includes("active order already exists")) {
-      return "An active order already exists for this item and delivery date."
-    }
-    if (message.includes("Vendors cannot order")) {
-      return "Vendors cannot order their own items."
-    }
-    if (message.includes("approved and active")) {
-      return "This item is not currently available to order."
-    }
-    if (message.includes("Item not found")) {
-      return "This item is no longer available."
-    }
-    return message
-  }
-
-  async function handleOrderSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleOrderSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!validateOrder()) return
+    if (!item) return
 
-    setIsSubmittingOrder(true)
-    setOrderSuccess(false)
+    const pendingOrder = {
+      itemId: id,
+      itemName: item.itemName,
+      price: item.price,
+      image: item.images?.[0] ?? "",
+      deliveryDate: orderValues.deliveryDate,
+      deliveryAddress: orderValues.deliveryAddress.trim(),
+      message: orderValues.message.trim(),
+    }
+
     try {
-      await createOrder({
-        itemId: id,
-        deliveryDate: orderValues.deliveryDate,
-        deliveryAddress: orderValues.deliveryAddress.trim(),
-        message: orderValues.message.trim() || undefined,
+      window.sessionStorage.setItem(
+        PENDING_ORDER_STORAGE_KEY,
+        JSON.stringify(pendingOrder)
+      )
+      router.push("/checkout")
+    } catch {
+      setOrderErrors({
+        form: "Unable to start checkout. Please try again.",
       })
-      setOrderSuccess(true)
-      setOrderErrors({})
-      toast({
-        variant: "success",
-        title: "Order placed",
-        description: "Your order has been submitted for vendor review.",
-      })
-    } catch (caughtError) {
-      const message =
-        caughtError instanceof Error
-          ? friendlyOrderError(caughtError.message)
-          : "Unable to place your order. Please try again."
-      setOrderErrors({ form: message })
-      toast({ variant: "error", title: "Order failed", description: message })
-    } finally {
-      setIsSubmittingOrder(false)
     }
   }
 
@@ -446,20 +422,6 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Ordering is available to customers only.
               </p>
-            ) : orderSuccess ? (
-              <div className="mt-3 space-y-3">
-                <p className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                  <CheckCircle2 className="size-5" aria-hidden="true" />
-                  Your order has been placed.
-                </p>
-                <Link
-                  href="/dashboard/customer/orders"
-                  className={cn(buttonVariants({ variant: "outline" }))}
-                >
-                  View my orders
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              </div>
             ) : (
               <form onSubmit={handleOrderSubmit} className="mt-4 space-y-4" noValidate>
                 <div>
@@ -568,27 +530,17 @@ export function MenuItemDetails({ id }: MenuItemDetailsProps) {
 
                 <button
                   type="submit"
-                  disabled={isSubmittingOrder}
                   className={cn(
                     "inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-6 text-sm font-semibold tracking-wide text-primary-foreground shadow-glow transition-all duration-300 ease-smooth",
                     "hover:-translate-y-0.5 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
                     "active:translate-y-0 active:scale-[0.99]",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    isSubmittingOrder &&
-                      "pointer-events-none cursor-not-allowed opacity-60 shadow-none hover:translate-y-0 hover:shadow-none active:scale-100"
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   )}
                 >
-                  {isSubmittingOrder ? (
-                    <span className="inline-flex items-center justify-center gap-2">
-                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                      Placing order...
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center justify-center gap-2">
-                      Place order
-                      <ArrowRight className="size-4" aria-hidden="true" />
-                    </span>
-                  )}
+                  <span className="inline-flex items-center justify-center gap-2">
+                    Proceed to Payment
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </span>
                 </button>
               </form>
             )}

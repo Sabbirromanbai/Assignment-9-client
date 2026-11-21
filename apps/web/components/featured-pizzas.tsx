@@ -45,12 +45,10 @@ export function FeaturedPizzas() {
         setError(null)
 
         const data = await fetchMenuItems({}, controller.signal)
-        const featured = data
-          .filter((item) => item.status === "approved")
-          .slice(0, FEATURED_COUNT)
+        const approved = data.filter((item) => item.status === "approved")
 
         const vendorIds = [
-          ...new Set(featured.map((item) => item.vendorId).filter(Boolean)),
+          ...new Set(approved.map((item) => item.vendorId).filter(Boolean)),
         ]
 
         const vendorResults = await Promise.allSettled(
@@ -68,6 +66,27 @@ export function FeaturedPizzas() {
             }
           }
         })
+
+        const premiumVendorIds = new Set(
+          vendorIds.filter(
+            (vendorId) => vendorMap[vendorId]?.subscriptionPlan === "premium"
+          )
+        )
+
+        const featured = approved
+          .map((item, index) => ({ item, index }))
+          .sort((a, b) => {
+            const aPremium = premiumVendorIds.has(a.item.vendorId)
+            const bPremium = premiumVendorIds.has(b.item.vendorId)
+
+            if (aPremium !== bPremium) {
+              return aPremium ? -1 : 1
+            }
+
+            return a.index - b.index
+          })
+          .slice(0, FEATURED_COUNT)
+          .map(({ item }) => item)
 
         setItems(featured)
         setVendors(vendorMap)

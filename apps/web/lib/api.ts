@@ -127,6 +127,25 @@ export async function updateVendorProfile(
   return response.data
 }
 
+export type ChooseRoleInput = {
+  role: "customer" | "vendor"
+}
+
+export async function chooseRole(
+  role: ChooseRoleInput["role"],
+  signal?: AbortSignal
+): Promise<void> {
+  await fetchWithAuth<{ role: string }>(
+    "/api/profile/choose-role",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role }),
+    },
+    signal
+  )
+}
+
 export async function fetchVendorProfile(
   vendorId: string,
   signal?: AbortSignal

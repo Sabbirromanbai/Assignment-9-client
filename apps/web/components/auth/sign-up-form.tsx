@@ -132,7 +132,7 @@ export function SignUpForm() {
     try {
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${window.location.origin}/`,
+        callbackURL: `${window.location.origin}/dashboard`,
       })
 
       if (error) {

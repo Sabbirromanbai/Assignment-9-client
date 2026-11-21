@@ -9,7 +9,8 @@ import { ROLE_HOME } from "@/lib/dashboard-nav"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { isPending, isAuthenticated, role } = useAuthSession()
+  const { isPending, isAuthenticated, role, roleSelectionPending } =
+    useAuthSession()
 
   React.useEffect(() => {
     if (isPending) {
@@ -21,8 +22,13 @@ export default function DashboardPage() {
       return
     }
 
+    if (roleSelectionPending) {
+      router.replace("/choose-role")
+      return
+    }
+
     router.replace(role ? ROLE_HOME[role] : "/sign-in?callbackURL=%2Fdashboard")
-  }, [isPending, isAuthenticated, role, router])
+  }, [isPending, isAuthenticated, role, roleSelectionPending, router])
 
   return (
     <div className="flex min-h-[60svh] items-center justify-center">

@@ -11,6 +11,7 @@ type AuthUser = {
   email?: string | null
   image?: string | null
   role?: string | null
+  roleSelectionPending?: boolean | null
 }
 
 export function useAuthSession() {
@@ -18,11 +19,13 @@ export function useAuthSession() {
 
   const rawUser = session.data?.user as AuthUser | undefined | null
   const role = normalizeRole(rawUser?.role) as DashboardRole | null
+  const roleSelectionPending = rawUser?.roleSelectionPending === true
 
   return {
     ...session,
     user: rawUser,
     role,
+    roleSelectionPending,
     isAuthenticated: Boolean(session.data?.session && rawUser),
   }
 }

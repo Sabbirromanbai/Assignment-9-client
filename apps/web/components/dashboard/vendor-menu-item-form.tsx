@@ -361,11 +361,11 @@ export function VendorMenuItemForm() {
               <button
                 type="submit"
                 disabled={isSubmitting || isImageUploading || !values.image}
-                className={cn(
-                  "h-11 w-full rounded-xl border border-border/70 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
-                  (isSubmitting || isImageUploading || !values.image) &&
-                    "cursor-not-allowed opacity-70 border-transparent"
-                )}
+                 className={cn(
+                   "inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border/70 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-elevated",
+                   (isSubmitting || isImageUploading || !values.image) &&
+                     "cursor-not-allowed border-transparent bg-muted text-muted-foreground shadow-none hover:shadow-none from-muted to-muted opacity-100"
+                 )}
               >
                 {isSubmitting ? (
                   <>

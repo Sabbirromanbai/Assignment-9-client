@@ -203,7 +203,7 @@ type ApiEnvelope<T> = {
 }
 
 export async function getAuthToken(signal?: AbortSignal): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
+  const response = await fetch("/api/auth/token", {
     signal,
     credentials: "include",
     headers: { Accept: "application/json" },

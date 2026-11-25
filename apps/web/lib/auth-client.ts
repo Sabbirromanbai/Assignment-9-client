@@ -1,11 +1,9 @@
 import { createAuthClient } from "better-auth/react"
 
-const baseURL =
-  process.env.NEXT_PUBLIC_BETTER_AUTH_URL?.replace(/\/$/, "") ||
-  "http://localhost:5000"
-
+// Leave baseURL unset so Better Auth uses the current frontend origin.
+// next.config.ts proxies /api/auth/* to the backend; this keeps the session
+// cookie first-party instead of relying on cross-site third-party cookies.
 export const authClient = createAuthClient({
-  baseURL,
   fetchOptions: {
     credentials: "include",
   },
